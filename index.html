@@ -1,26 +1,92 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Firestore Demo</title>
+  <meta charset="utf-8">
+  <title>我的料理實驗紀錄簿</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 650px; margin: auto; line-height: 1.5; }
+    .section { background: #f8f9fa; border: 1px solid #e9ecef; padding: 18px; border-radius: 8px; margin-bottom: 20px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: inline-block; width: 140px; font-weight: bold; }
+    input[type="text"], select, textarea, input[type="date"] { padding: 6px; width: 60%; box-sizing: border-box; }
+    textarea { height: 70px; vertical-align: top; }
+    button { padding: 8px 16px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 4px; font-size: 14px; }
+    button:hover { background: #45a049; }
+    .btn-random { background: #2196F3; }
+    .btn-random:hover { background: #0b7dda; }
+    #randomResult { color: #e65100; background: #fff3e0; padding: 10px; border-radius: 4px; border-left: 4px solid #ff9800; display: none; }
+    ul { list-style: none; padding: 0; }
+    li { background: white; border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
+    .tag { display: inline-block; background: #e0e0e0; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px; }
+    .tag-yes { background: #e8f5e9; color: #2e7d32; }
+    .tag-no { background: #ffebee; color: #c62828; }
+  </style>
 </head>
 <body>
 
-  <h1>我的第一個 Firestore App</h1>
+  <h1>🍳 我的料理實驗紀錄簿</h1>
 
-  <input id="msg" placeholder="輸入訊息">
-  <button onclick="addData()">儲存</button>
+  <!-- 區塊 1：新增料理實驗記錄 -->
+  <div class="section">
+    <h3>📝 新增實驗紀錄</h3>
+    
+    <div class="form-group">
+      <label for="foodName">料理名稱：</label>
+      <input id="foodName" placeholder="例如：日式黑咖哩">
+    </div>
 
-  <ul id="list"></ul>
+    <div class="form-group">
+      <label for="cookDate">實驗日期：</label>
+      <input type="date" id="cookDate">
+    </div>
+
+    <div class="form-group">
+      <label for="foodCategory">類別：</label>
+      <select id="foodCategory">
+        <option value="主食">主食</option>
+        <option value="配菜">配菜</option>
+        <option value="湯品">湯品</option>
+        <option value="甜點/點心">甜點/點心</option>
+        <option value="飲料">飲料</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="foodSteps">步驟 / 心得：</label>
+      <textarea id="foodSteps" placeholder="簡單紀錄下洋蔥炒多久、調味料加了多少..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="tryAgain">下次還想嘗試嗎？</label>
+      <select id="tryAgain">
+        <option value="是">是 (值得再做)</option>
+        <option value="否">否 (大失敗/普通)</option>
+      </select>
+    </div>
+
+    <button onclick="addRecipe()">儲存實驗紀錄</button>
+  </div>
+
+  <!-- 區塊 2：隨機抽籤 -->
+  <div class="section">
+    <h3>🎲 今天要複習哪道菜？</h3>
+    <p style="font-size: 14px; color: #666;">預設只會隨機抽取「下次還想嘗試 (是)」的料理喔！</p>
+    
+    <button class="btn-random" onclick="pickRandom()">幫我選一道菜！</button>
+    <div id="randomResult"></div>
+  </div>
+
+  <!-- 區塊 3：所有歷史紀錄列表 -->
+  <div class="section">
+    <h3>📚 料理實驗紀錄庫</h3>
+    <ul id="list"></ul>
+  </div>
 
   <script type="module">
-    import { initializeApp } from 
-      "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { 
-      getFirestore, collection, addDoc, getDocs 
-    } from 
-      "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      getFirestore, collection, addDoc, getDocs, query, where 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyA0gCb7A7YPareF8esh8ct-rj955CjCPZM",
@@ -32,25 +98,102 @@
       measurementId: "G-EGC3BZZD3P"
     };
 
-
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    window.addData = async function() {
-      const msg = document.getElementById("msg").value;
-      await addDoc(collection(db, "messages"), { text: msg });
-      loadData();
+    // 預設將今天的日期帶入日期輸入框
+    document.getElementById("cookDate").valueAsDate = new Date();
+
+    // 1. 新增料理紀錄到 Firestore
+    window.addRecipe = async function() {
+      const name = document.getElementById("foodName").value;
+      const date = document.getElementById("cookDate").value;
+      const category = document.getElementById("foodCategory").value;
+      const steps = document.getElementById("foodSteps").value;
+      const tryAgain = document.getElementById("tryAgain").value;
+
+      if (!name) {
+        alert("請輸入料理名稱！");
+        return;
+      }
+
+      // 儲存到 "recipes" 集合
+      await addDoc(collection(db, "recipes"), { 
+        name: name,
+        date: date,
+        category: category,
+        steps: steps,
+        tryAgain: tryAgain,
+        createdAt: new Date() // 新增建立時間戳記
+      });
+      
+      // 清空表單欄位
+      document.getElementById("foodName").value = "";
+      document.getElementById("foodSteps").value = "";
+      
+      alert("儲存成功！");
+      loadData(); // 重新讀取清單
     }
 
+    // 2. 隨機挑選料理 (只抽 "下次還想嘗試" 等於 "是" 的)
+    window.pickRandom = async function() {
+      // 透過 query 與 where 篩選 tryAgain == "是" 的資料
+      const q = query(collection(db, "recipes"), where("tryAgain", "==", "是"));
+      const querySnapshot = await getDocs(q);
+      
+      const recipesArray = [];
+      querySnapshot.forEach(doc => {
+        recipesArray.push(doc.data());
+      });
+
+      const resultDiv = document.getElementById("randomResult");
+      resultDiv.style.display = "block";
+      
+      if (recipesArray.length === 0) {
+        resultDiv.innerHTML = "目前沒有標記為「還想嘗試」的料理喔，快去新增吧！";
+      } else {
+        const randomIndex = Math.floor(Math.random() * recipesArray.length);
+        const selected = recipesArray[randomIndex];
+        resultDiv.innerHTML = `
+          <strong>🎉 今天就做：【 ${selected.name} 】！</strong><br>
+          <small>類別：${selected.category} | 上次實驗日期：${selected.date || '未填寫'}</small><br>
+          <div style="margin-top: 5px; white-space: pre-wrap;"><strong>做法備忘：</strong><br>${selected.steps || '無記載步驟'}</div>
+        `;
+      }
+    }
+
+    // 3. 載入所有歷史紀錄清單
     async function loadData() {
-      const querySnapshot = await getDocs(collection(db, "messages"));
+      const querySnapshot = await getDocs(collection(db, "recipes"));
       const list = document.getElementById("list");
       list.innerHTML = "";
+
+      if (querySnapshot.empty) {
+        list.innerHTML = "<li>目前還沒有任何實驗紀錄喔！</li>";
+        return;
+      }
+
       querySnapshot.forEach(doc => {
-        list.innerHTML += "<li>" + doc.data().text + "</li>";
+        const data = doc.data();
+        const tryAgainTagClass = data.tryAgain === "是" ? "tag-yes" : "tag-no";
+        
+        list.innerHTML += `
+          <li>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong>${data.name}</strong>
+              <small style="color: #666;">${data.date || ''}</small>
+            </div>
+            <div style="margin: 8px 0;">
+              <span class="tag">${data.category}</span>
+              <span class="tag ${tryAgainTagClass}">下次再試：${data.tryAgain}</span>
+            </div>
+            ${data.steps ? `<div style="font-size: 14px; color: #444; background: #f0f0f0; padding: 8px; border-radius: 4px; white-space: pre-wrap;">${data.steps}</div>` : ''}
+          </li>
+        `;
       });
     }
 
+    // 頁面載入完畢後先讀取一次
     loadData();
   </script>
 
