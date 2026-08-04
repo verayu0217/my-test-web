@@ -1,12 +1,58 @@
+
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>我的第一個網頁</title>
+  <title>Firestore Demo</title>
 </head>
 <body>
-    <h1>歡迎來到我的網頁</h1>
-    <p>這是一個非常簡單的 HTML 網頁範例。</p>
-    <a href="https://google.com">點擊這裡去 Google</a>
+
+  <h1>我的第一個 Firestore App</h1>
+
+  <input id="msg" placeholder="輸入訊息">
+  <button onclick="addData()">儲存</button>
+
+  <ul id="list"></ul>
+
+  <script type="module">
+    import { initializeApp } from 
+      "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+    import { 
+      getFirestore, collection, addDoc, getDocs 
+    } from 
+      "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA0gCb7A7YPareF8esh8ct-rj955CjCPZM",
+      authDomain: "my-test-db-b9117.firebaseapp.com",
+      projectId: "my-test-db-b9117",
+      storageBucket: "my-test-db-b9117.firebasestorage.app",
+      messagingSenderId: "279887826419",
+      appId: "1:279887826419:web:0b9fdbc1883533ace81686",
+      measurementId: "G-EGC3BZZD3P"
+    };
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.addData = async function() {
+      const msg = document.getElementById("msg").value;
+      await addDoc(collection(db, "messages"), { text: msg });
+      loadData();
+    }
+
+    async function loadData() {
+      const querySnapshot = await getDocs(collection(db, "messages"));
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+      querySnapshot.forEach(doc => {
+        list.innerHTML += "<li>" + doc.data().text + "</li>";
+      });
+    }
+
+    loadData();
+  </script>
+
 </body>
 </html>
