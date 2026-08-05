@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>極簡代辦清單 | My To-Do App</title>
+  <title>極簡工作台 | To-Do & Learning Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 圖示套件 -->
@@ -13,65 +13,167 @@
   <style>
     body { font-family: 'Inter', sans-serif; }
     .glass-card {
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-slate-800 flex flex-col items-center p-4 sm:p-8">
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-slate-800 p-4 sm:p-8 flex items-center justify-center">
 
-  <!-- 主要容器 -->
-  <main class="w-full max-w-xl glass-card rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 my-auto">
-    
-    <!-- 標頭 -->
-    <header class="mb-8 flex justify-between items-center">
+  <!-- 主雙欄容器 -->
+  <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto">
+
+    <!-- ==================== 左欄：TO-DO LIST (佔 7 欄) ==================== -->
+    <main class="lg:col-span-7 glass-card rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 flex flex-col justify-between">
       <div>
-        <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-          My Tasks
-        </h1>
-        <p class="text-sm text-slate-500 mt-1" id="date-display">載入日期中...</p>
-      </div>
-      <div class="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">
-        <span id="completed-count">0</span> / <span id="total-count">0</span> 完成
-      </div>
-    </header>
+        <!-- 標頭 -->
+        <header class="mb-6 flex justify-between items-center">
+          <div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              My Tasks
+            </h1>
+            <p class="text-sm text-slate-500 mt-1" id="date-display">載入日期中...</p>
+          </div>
+          <div class="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">
+            <span id="completed-count">0</span> / <span id="total-count">0</span> 完成
+          </div>
+        </header>
 
-    <!-- 輸入框區塊 -->
-    <form id="todo-form" class="flex gap-2 mb-6">
-      <div class="relative flex-1">
-        <input 
-          type="text" 
-          id="todo-input"
-          placeholder="今天想完成什麼任務？" 
-          class="w-full px-4 py-3.5 pl-11 rounded-xl bg-slate-100/80 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm"
-          required
-        >
-        <i class="fa-solid fa-plus absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        <!-- 輸入框區塊 -->
+        <form id="todo-form" class="flex flex-col sm:flex-row gap-2 mb-6">
+          <div class="relative flex-1">
+            <input 
+              type="text" 
+              id="todo-input"
+              placeholder="想完成什麼任務？" 
+              class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-100/80 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm"
+              required
+            >
+            <i class="fa-solid fa-plus absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          </div>
+
+          <!-- 日期選擇器 -->
+          <input 
+            type="date" 
+            id="todo-date"
+            class="w-full sm:w-auto px-3 py-3 rounded-xl bg-slate-100/80 border border-slate-200 text-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all cursor-pointer"
+            required
+          >
+
+          <button 
+            type="submit" 
+            class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 text-sm flex items-center justify-center gap-2 whitespace-nowrap"
+          >
+            <span>新增</span>
+          </button>
+        </form>
+
+        <!-- 待辦清單列表 -->
+        <ul id="todo-list" class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+          <div class="text-center py-10 text-slate-400">
+            <i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i>
+            <p class="text-sm">連線至 Firebase 中...</p>
+          </div>
+        </ul>
       </div>
-      <button 
-        type="submit" 
-        class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 text-sm flex items-center gap-2 whitespace-nowrap"
-      >
-        <span>新增</span>
-      </button>
-    </form>
 
-    <!-- 待辦清單列表 -->
-    <ul id="todo-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-1">
-      <!-- 預設載入狀態 -->
-      <div class="text-center py-10 text-slate-400">
-        <i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i>
-        <p class="text-sm">連線至 Firebase 中...</p>
-      </div>
-    </ul>
+      <!-- 頁尾 -->
+      <footer class="mt-6 pt-4 border-t border-slate-200/60 text-xs text-slate-400 font-light text-center sm:text-left">
+        Hosted on <span class="text-slate-600 font-medium">Vercel</span> • Powered by <span class="text-slate-600 font-medium">Firebase</span>
+      </footer>
+    </main>
 
-  </main>
 
-  <!-- 頁尾 -->
-  <footer class="mt-6 text-xs text-slate-400 font-light">
-    Hosted on <span class="text-slate-300 font-medium">Vercel</span> • Powered by <span class="text-slate-300 font-medium">Firebase</span>
-  </footer>
+    <!-- ==================== 右欄：學習與研究區 (佔 5 欄) ==================== -->
+    <aside class="lg:col-span-5 flex flex-col gap-6">
+
+      <!-- 區塊 1：英文單字筆記卡 (Word of the Day) -->
+      <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2 text-indigo-600 font-bold text-sm tracking-wider uppercase">
+            <i class="fa-solid fa-language text-base"></i>
+            <span>英文單字筆記</span>
+          </div>
+        </div>
+
+        <!-- 新增單字表單 -->
+        <form id="vocab-form" class="space-y-2 mb-4">
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              id="vocab-word" 
+              placeholder="英文單字 (例如: Refactor)" 
+              class="flex-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            >
+            <!-- 詞性下拉選單 -->
+            <select id="vocab-pos" class="px-2 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option value="v.">v.</option>
+              <option value="n.">n.</option>
+              <option value="adj.">adj.</option>
+              <option value="adv.">adv.</option>
+              <option value="phr.">phr.</option>
+            </select>
+          </div>
+          <input 
+            type="text" 
+            id="vocab-meaning" 
+            placeholder="中文解釋 (例如: 重構)" 
+            class="w-full px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            required
+          >
+          <div class="flex gap-2">
+            <input 
+              type="text" 
+              id="vocab-example" 
+              placeholder="例句 (選填)" 
+              class="flex-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-lg transition-all font-medium">
+              儲存
+            </button>
+          </div>
+        </form>
+
+        <!-- 單字列表 -->
+        <ul id="vocab-list" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
+          <div class="text-center py-6 text-slate-400 text-xs">載入單字庫中...</div>
+        </ul>
+      </section>
+
+
+      <!-- 區塊 2：想要研究的新東西 (Research Backlog) -->
+      <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6">
+        <div class="flex items-center gap-2 text-purple-600 font-bold text-sm tracking-wider uppercase mb-4">
+          <i class="fa-solid fa-flask text-base"></i>
+          <span>想要研究的新東西</span>
+        </div>
+
+        <!-- 新增研究主題表單 -->
+        <form id="research-form" class="flex gap-2 mb-4">
+          <input 
+            type="text" 
+            id="research-input" 
+            placeholder="如: Playwright, Docker, AWS..." 
+            class="flex-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+            required
+          >
+          <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 py-2 rounded-lg transition-all font-medium">
+            新增
+          </button>
+        </form>
+
+        <!-- 研究主題列表 (以卡片/標籤呈現) -->
+        <ul id="research-list" class="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto pr-1">
+          <div class="text-center w-full py-4 text-slate-400 text-xs">載入清單中...</div>
+        </ul>
+      </section>
+
+    </aside>
+
+  </div>
+
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -89,7 +191,7 @@
       orderBy 
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ✅ 已代入你的 Firebase 設定
+    // ✅ Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyA0gCb7A7YPareF8esh8ct-rj955CjCPZM",
       authDomain: "my-test-db-b9117.firebaseapp.com",
@@ -100,102 +202,245 @@
       measurementId: "G-EGC3BZZD3P"
     };
 
-    // 初始化 Firebase & Firestore
+    // 初始化 Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const todosRef = collection(db, "todos");
 
-    // DOM 元素
-    const todoForm = document.getElementById('todo-form');
-    const todoInput = document.getElementById('todo-input');
-    const todoList = document.getElementById('todo-list');
-    const completedCountEl = document.getElementById('completed-count');
-    const totalCountEl = document.getElementById('total-count');
+    // Collections
+    const todosRef = collection(db, "todos");
+    const vocabRef = collection(db, "vocabularies");
+    const researchRef = collection(db, "research");
 
     // 顯示今日日期
     const options = { weekday: 'long', month: 'short', day: 'numeric' };
     document.getElementById('date-display').textContent = new Date().toLocaleDateString('zh-TW', options);
 
-    // 新增代辦事項
+
+    // ==================== 1. TO-DO LIST 邏輯 ====================
+    const todoForm = document.getElementById('todo-form');
+    const todoInput = document.getElementById('todo-input');
+    const todoDateInput = document.getElementById('todo-date');
+    const todoList = document.getElementById('todo-list');
+    const completedCountEl = document.getElementById('completed-count');
+    const totalCountEl = document.getElementById('total-count');
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    todoDateInput.value = todayStr;
+
     todoForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const text = todoInput.value.trim();
-      if (!text) return;
+      const dueDate = todoDateInput.value;
+      if (!text || !dueDate) return;
 
       try {
         await addDoc(todosRef, {
           text: text,
+          dueDate: dueDate,
           completed: false,
           createdAt: serverTimestamp()
         });
         todoInput.value = '';
+        todoDateInput.value = todayStr;
       } catch (err) {
         console.error("新增失敗：", err);
       }
     });
 
-    // 實時監聽 Firestore 資料變更 (Realtime Sync)
-    const q = query(todosRef, orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
+    function getDueDateBadge(dueDateStr, isCompleted) {
+      if (!dueDateStr) return '';
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const targetDate = new Date(dueDateStr + 'T00:00:00');
+      const diffDays = Math.round((targetDate - today) / (1000 * 60 * 60 * 24));
+
+      let badgeClass = "bg-slate-100 text-slate-500";
+      let labelText = dueDateStr;
+
+      if (diffDays === 0) {
+        labelText = "今天";
+        badgeClass = "bg-indigo-50 text-indigo-600 font-medium";
+      } else if (diffDays === 1) {
+        labelText = "明天";
+        badgeClass = "bg-sky-50 text-sky-600 font-medium";
+      } else if (diffDays < 0 && !isCompleted) {
+        labelText = `已逾期 (${dueDateStr})`;
+        badgeClass = "bg-rose-50 text-rose-600 font-medium";
+      }
+
+      return `<span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md ${badgeClass}">
+        <i class="fa-regular fa-calendar text-[10px]"></i> ${labelText}
+      </span>`;
+    }
+
+    onSnapshot(query(todosRef, orderBy("createdAt", "desc")), (snapshot) => {
       todoList.innerHTML = '';
       let completedCount = 0;
       const totalCount = snapshot.docs.length;
 
       if (totalCount === 0) {
-        todoList.innerHTML = `
-          <div class="text-center py-10 text-slate-400">
-            <i class="fa-regular fa-clipboard text-3xl mb-2 stroke-1"></i>
-            <p class="text-sm">目前沒有任何任務，新增一個吧！</p>
-          </div>`;
+        todoList.innerHTML = `<div class="text-center py-10 text-slate-400"><p class="text-sm">目前沒有任何任務！</p></div>`;
       }
 
       snapshot.docs.forEach((docSnapshot) => {
         const todo = docSnapshot.data();
         const id = docSnapshot.id;
-
         if (todo.completed) completedCount++;
 
         const li = document.createElement('li');
-        li.className = `group flex items-center justify-between p-4 rounded-2xl bg-white/60 hover:bg-white border border-slate-100 shadow-sm transition-all duration-200 ${todo.completed ? 'opacity-60' : ''}`;
+        li.className = `group flex items-center justify-between p-3.5 rounded-2xl bg-white/60 hover:bg-white border border-slate-100 shadow-sm transition-all ${todo.completed ? 'opacity-60' : ''}`;
         
         li.innerHTML = `
           <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
-            <button class="toggle-btn w-6 h-6 rounded-full border-2 ${todo.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-indigo-500'} flex items-center justify-center transition-colors shrink-0">
-              <i class="fa-solid fa-check text-xs ${todo.completed ? 'block' : 'hidden'}"></i>
+            <button class="toggle-btn w-5 h-5 rounded-full border-2 ${todo.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-indigo-500'} flex items-center justify-center transition-colors shrink-0">
+              <i class="fa-solid fa-check text-[10px] ${todo.completed ? 'block' : 'hidden'}"></i>
             </button>
-            <span class="text-sm text-slate-700 truncate ${todo.completed ? 'line-through text-slate-400' : 'font-medium'}">
-              ${escapeHtml(todo.text)}
-            </span>
+            <div class="flex flex-col min-w-0">
+              <span class="text-sm text-slate-700 truncate ${todo.completed ? 'line-through text-slate-400' : 'font-medium'}">
+                ${escapeHtml(todo.text)}
+              </span>
+              <div class="mt-0.5">${getDueDateBadge(todo.dueDate, todo.completed)}</div>
+            </div>
           </div>
-          <button class="delete-btn opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 p-2 transition-all">
-            <i class="fa-regular fa-trash-can"></i>
+          <button class="delete-btn opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 p-1.5 transition-all">
+            <i class="fa-regular fa-trash-can text-sm"></i>
           </button>
         `;
 
-        // 切換完成狀態
-        li.querySelector('.toggle-btn').addEventListener('click', async () => {
-          await updateDoc(doc(db, "todos", id), {
-            completed: !todo.completed
-          });
-        });
-
-        // 刪除項目
-        li.querySelector('.delete-btn').addEventListener('click', async () => {
-          await deleteDoc(doc(db, "todos", id));
-        });
-
+        li.querySelector('.toggle-btn').addEventListener('click', () => updateDoc(doc(db, "todos", id), { completed: !todo.completed }));
+        li.querySelector('.delete-btn').addEventListener('click', () => deleteDoc(doc(db, "todos", id)));
         todoList.appendChild(li);
-      }, (error) => {
-        console.error("Firestore 監聽失敗：", error);
-        todoList.innerHTML = `<p class="text-center text-rose-500 text-sm">無法讀取資料，請確認 Firestore 權限規則設定。</p>`;
       });
 
-      // 更新統計數字
       completedCountEl.textContent = completedCount;
       totalCountEl.textContent = totalCount;
     });
 
-    // 防範 XSS 攻擊轉義字元
+
+    // ==================== 2. 英文單字庫邏輯 (含詞性/發音) ====================
+    const vocabForm = document.getElementById('vocab-form');
+    const vocabList = document.getElementById('vocab-list');
+
+    // 瀏覽器語音發音功能 (Text-to-Speech)
+    window.speakText = function(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert("您的瀏覽器不支援語音發音功能。");
+      }
+    };
+
+    vocabForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const word = document.getElementById('vocab-word').value.trim();
+      const pos = document.getElementById('vocab-pos').value;
+      const meaning = document.getElementById('vocab-meaning').value.trim();
+      const example = document.getElementById('vocab-example').value.trim();
+
+      if (!word || !meaning) return;
+
+      try {
+        await addDoc(vocabRef, {
+          word,
+          pos,
+          meaning,
+          example,
+          createdAt: serverTimestamp()
+        });
+        vocabForm.reset();
+      } catch (err) {
+        console.error("新增單字失敗：", err);
+      }
+    });
+
+    onSnapshot(query(vocabRef, orderBy("createdAt", "desc")), (snapshot) => {
+      vocabList.innerHTML = '';
+      if (snapshot.docs.length === 0) {
+        vocabList.innerHTML = `<p class="text-center text-slate-400 text-xs py-4">還沒有儲存單字，新增第一個吧！</p>`;
+      }
+
+      snapshot.docs.forEach((docSnapshot) => {
+        const item = docSnapshot.data();
+        const id = docSnapshot.id;
+
+        const li = document.createElement('li');
+        li.className = "group bg-white/70 hover:bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1 transition-all relative";
+
+        li.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-slate-800 text-sm">${escapeHtml(item.word)}</span>
+              <span class="text-[10px] font-semibold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">${escapeHtml(item.pos)}</span>
+              <!-- 發音按鈕 -->
+              <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-500 hover:text-indigo-700 text-xs ml-1" title="點擊發音">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+            <button class="delete-vocab opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all text-xs">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+          <p class="text-xs text-slate-600 font-medium">${escapeHtml(item.meaning)}</p>
+          ${item.example ? `<p class="text-[11px] text-slate-400 italic border-l-2 border-indigo-200 pl-1.5 mt-0.5 font-light">"${escapeHtml(item.example)}"</p>` : ''}
+        `;
+
+        li.querySelector('.delete-vocab').addEventListener('click', () => deleteDoc(doc(db, "vocabularies", id)));
+        vocabList.appendChild(li);
+      });
+    });
+
+
+    // ==================== 3. 想要研究的新東西邏輯 ====================
+    const researchForm = document.getElementById('research-form');
+    const researchInput = document.getElementById('research-input');
+    const researchList = document.getElementById('research-list');
+
+    researchForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const topic = researchInput.value.trim();
+      if (!topic) return;
+
+      try {
+        await addDoc(researchRef, {
+          topic,
+          createdAt: serverTimestamp()
+        });
+        researchInput.value = '';
+      } catch (err) {
+        console.error("新增研究主題失敗：", err);
+      }
+    });
+
+    onSnapshot(query(researchRef, orderBy("createdAt", "desc")), (snapshot) => {
+      researchList.innerHTML = '';
+      if (snapshot.docs.length === 0) {
+        researchList.innerHTML = `<p class="text-center text-slate-400 text-xs w-full py-2">記下你想研究的新技術或主題吧！</p>`;
+      }
+
+      snapshot.docs.forEach((docSnapshot) => {
+        const item = docSnapshot.data();
+        const id = docSnapshot.id;
+
+        const li = document.createElement('li');
+        li.className = "group inline-flex items-center gap-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200/60 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shadow-sm";
+
+        li.innerHTML = `
+          <span>${escapeHtml(item.topic)}</span>
+          <button class="delete-research opacity-0 group-hover:opacity-100 text-purple-400 hover:text-rose-500 transition-all">
+            <i class="fa-solid fa-xmark text-xs"></i>
+          </button>
+        `;
+
+        li.querySelector('.delete-research').addEventListener('click', () => deleteDoc(doc(db, "research", id)));
+        researchList.appendChild(li);
+      });
+    });
+
+
+    // 防範 XSS 攻擊
     function escapeHtml(text) {
       return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : '';
     }
