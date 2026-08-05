@@ -70,7 +70,7 @@
         </form>
 
         <!-- 待辦清單列表 -->
-        <ul id="todo-list" class="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+        <ul id="todo-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-1">
           <div class="text-center py-10 text-slate-400">
             <i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i>
             <p class="text-sm">連線至 Firebase 中...</p>
@@ -88,11 +88,11 @@
     <!-- ==================== 右欄：學習與研究區 (佔 5 欄) ==================== -->
     <aside class="lg:col-span-5 flex flex-col gap-6">
 
-      <!-- 區塊 1：英文單字筆記卡 (Word of the Day) -->
-      <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6">
+      <!-- 區塊 1：英文單字筆記卡 (Word of the Day - 加高大版型) -->
+      <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6 flex-1">
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2 text-indigo-600 font-bold text-sm tracking-wider uppercase">
-            <i class="fa-solid fa-language text-base"></i>
+            <i class="fa-solid fa-language text-lg"></i>
             <span>英文單字筆記</span>
           </div>
         </div>
@@ -104,11 +104,11 @@
               type="text" 
               id="vocab-word" 
               placeholder="英文單字 (例如: Refactor)" 
-              class="flex-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             >
             <!-- 詞性下拉選單 -->
-            <select id="vocab-pos" class="px-2 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="vocab-pos" class="px-2.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="v.">v.</option>
               <option value="n.">n.</option>
               <option value="adj.">adj.</option>
@@ -120,7 +120,7 @@
             type="text" 
             id="vocab-meaning" 
             placeholder="中文解釋 (例如: 重構)" 
-            class="w-full px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           >
           <div class="flex gap-2">
@@ -128,16 +128,16 @@
               type="text" 
               id="vocab-example" 
               placeholder="例句 (選填)" 
-              class="flex-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-lg transition-all font-medium">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-indigo-500/10">
               儲存
             </button>
           </div>
         </form>
 
-        <!-- 單字列表 -->
-        <ul id="vocab-list" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
+        <!-- 單字列表 (提升 max-height 讓區塊長度增加) -->
+        <ul id="vocab-list" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
           <div class="text-center py-6 text-slate-400 text-xs">載入單字庫中...</div>
         </ul>
       </section>
@@ -156,16 +156,16 @@
             type="text" 
             id="research-input" 
             placeholder="如: Playwright, Docker, AWS..." 
-            class="flex-1 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+            class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
           >
-          <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white text-xs px-4 py-2 rounded-lg transition-all font-medium">
+          <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-purple-500/10">
             新增
           </button>
         </form>
 
-        <!-- 研究主題列表 (以卡片/標籤呈現) -->
-        <ul id="research-list" class="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto pr-1">
+        <!-- 研究主題列表 (標籤式呈現) -->
+        <ul id="research-list" class="flex flex-wrap gap-2 max-h-[140px] overflow-y-auto pr-1">
           <div class="text-center w-full py-4 text-slate-400 text-xs">載入清單中...</div>
         </ul>
       </section>
@@ -317,11 +317,11 @@
     });
 
 
-    // ==================== 2. 英文單字庫邏輯 (含詞性/發音) ====================
+    // ==================== 2. 英文單字庫邏輯 (含詞性/發音 - 放大版) ====================
     const vocabForm = document.getElementById('vocab-form');
     const vocabList = document.getElementById('vocab-list');
 
-    // 瀏覽器語音發音功能 (Text-to-Speech)
+    // 瀏覽器發音 (TTS)
     window.speakText = function(text) {
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
@@ -367,24 +367,24 @@
         const id = docSnapshot.id;
 
         const li = document.createElement('li');
-        li.className = "group bg-white/70 hover:bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex flex-col gap-1 transition-all relative";
+        li.className = "group bg-white/80 hover:bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-1 transition-all relative";
 
         li.innerHTML = `
           <div class="flex items-center justify-between">
             <div class="flex items-baseline gap-2">
-              <span class="font-bold text-slate-800 text-sm">${escapeHtml(item.word)}</span>
-              <span class="text-[10px] font-semibold bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded">${escapeHtml(item.pos)}</span>
+              <span class="font-bold text-slate-800 text-base tracking-wide">${escapeHtml(item.word)}</span>
+              <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md">${escapeHtml(item.pos)}</span>
               <!-- 發音按鈕 -->
-              <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-500 hover:text-indigo-700 text-xs ml-1" title="點擊發音">
+              <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-500 hover:text-indigo-700 text-sm ml-1 transition-transform active:scale-110" title="點擊發音">
                 <i class="fa-solid fa-volume-high"></i>
               </button>
             </div>
-            <button class="delete-vocab opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all text-xs">
+            <button class="delete-vocab opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all text-xs p-1">
               <i class="fa-regular fa-trash-can"></i>
             </button>
           </div>
-          <p class="text-xs text-slate-600 font-medium">${escapeHtml(item.meaning)}</p>
-          ${item.example ? `<p class="text-[11px] text-slate-400 italic border-l-2 border-indigo-200 pl-1.5 mt-0.5 font-light">"${escapeHtml(item.example)}"</p>` : ''}
+          <p class="text-sm text-slate-700 font-medium">${escapeHtml(item.meaning)}</p>
+          ${item.example ? `<p class="text-xs text-slate-500 italic border-l-2 border-indigo-300 pl-2 mt-1 font-light">"${escapeHtml(item.example)}"</p>` : ''}
         `;
 
         li.querySelector('.delete-vocab').addEventListener('click', () => deleteDoc(doc(db, "vocabularies", id)));
