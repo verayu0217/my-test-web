@@ -1,93 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-  <meta charset="utf-8">
-  <title>我的料理實驗紀錄簿</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>極簡代辦清單 | My To-Do App</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 圖示套件 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google 字體 Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 650px; margin: auto; line-height: 1.5; }
-    .section { background: #f8f9fa; border: 1px solid #e9ecef; padding: 18px; border-radius: 8px; margin-bottom: 20px; }
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: inline-block; width: 140px; font-weight: bold; }
-    input[type="text"], select, textarea, input[type="date"] { padding: 6px; width: 60%; box-sizing: border-box; }
-    textarea { height: 70px; vertical-align: top; }
-    button { padding: 8px 16px; cursor: pointer; background: #4CAF50; color: white; border: none; border-radius: 4px; font-size: 14px; }
-    button:hover { background: #45a049; }
-    .btn-random { background: #2196F3; }
-    .btn-random:hover { background: #0b7dda; }
-    #randomResult { color: #e65100; background: #fff3e0; padding: 10px; border-radius: 4px; border-left: 4px solid #ff9800; display: none; }
-    ul { list-style: none; padding: 0; }
-    li { background: white; border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-bottom: 10px; }
-    .tag { display: inline-block; background: #e0e0e0; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-right: 5px; }
-    .tag-yes { background: #e8f5e9; color: #2e7d32; }
-    .tag-no { background: #ffebee; color: #c62828; }
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
   </style>
 </head>
-<body>
+<body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-slate-800 flex flex-col items-center p-4 sm:p-8">
 
-  <h1>🍳 我的料理實驗紀錄簿</h1>
-
-  <!-- 區塊 1：新增料理實驗記錄 -->
-  <div class="section">
-    <h3>📝 新增實驗紀錄</h3>
+  <!-- 主要容器 -->
+  <main class="w-full max-w-xl glass-card rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 my-auto">
     
-    <div class="form-group">
-      <label for="foodName">料理名稱：</label>
-      <input id="foodName" placeholder="例如：日式黑咖哩">
-    </div>
+    <!-- 標頭 -->
+    <header class="mb-8 flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          My Tasks
+        </h1>
+        <p class="text-sm text-slate-500 mt-1" id="date-display">載入日期中...</p>
+      </div>
+      <div class="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">
+        <span id="completed-count">0</span> / <span id="total-count">0</span> 完成
+      </div>
+    </header>
 
-    <div class="form-group">
-      <label for="cookDate">實驗日期：</label>
-      <input type="date" id="cookDate">
-    </div>
+    <!-- 輸入框區塊 -->
+    <form id="todo-form" class="flex gap-2 mb-6">
+      <div class="relative flex-1">
+        <input 
+          type="text" 
+          id="todo-input"
+          placeholder="今天想完成什麼任務？" 
+          class="w-full px-4 py-3.5 pl-11 rounded-xl bg-slate-100/80 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm"
+          required
+        >
+        <i class="fa-solid fa-plus absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+      </div>
+      <button 
+        type="submit" 
+        class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 text-sm flex items-center gap-2 whitespace-nowrap"
+      >
+        <span>新增</span>
+      </button>
+    </form>
 
-    <div class="form-group">
-      <label for="foodCategory">類別：</label>
-      <select id="foodCategory">
-        <option value="主食">主食</option>
-        <option value="配菜">配菜</option>
-        <option value="湯品">湯品</option>
-        <option value="甜點/點心">甜點/點心</option>
-        <option value="飲料">飲料</option>
-      </select>
-    </div>
+    <!-- 待辦清單列表 -->
+    <ul id="todo-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+      <!-- 預設載入狀態 -->
+      <div class="text-center py-10 text-slate-400">
+        <i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i>
+        <p class="text-sm">連線至 Firebase 中...</p>
+      </div>
+    </ul>
 
-    <div class="form-group">
-      <label for="foodSteps">步驟 / 心得：</label>
-      <textarea id="foodSteps" placeholder="簡單紀錄下洋蔥炒多久、調味料加了多少..."></textarea>
-    </div>
+  </main>
 
-    <div class="form-group">
-      <label for="tryAgain">下次還想嘗試嗎？</label>
-      <select id="tryAgain">
-        <option value="是">是 (值得再做)</option>
-        <option value="否">否 (大失敗/普通)</option>
-      </select>
-    </div>
+  <!-- 頁尾 -->
+  <footer class="mt-6 text-xs text-slate-400 font-light">
+    Hosted on <span class="text-slate-300 font-medium">Vercel</span> • Powered by <span class="text-slate-300 font-medium">Firebase</span>
+  </footer>
 
-    <button onclick="addRecipe()">儲存實驗紀錄</button>
-  </div>
-
-  <!-- 區塊 2：隨機抽籤 -->
-  <div class="section">
-    <h3>🎲 今天要複習哪道菜？</h3>
-    <p style="font-size: 14px; color: #666;">預設只會隨機抽取「下次還想嘗試 (是)」的料理喔！</p>
-    
-    <button class="btn-random" onclick="pickRandom()">幫我選一道菜！</button>
-    <div id="randomResult"></div>
-  </div>
-
-  <!-- 區塊 3：所有歷史紀錄列表 -->
-  <div class="section">
-    <h3>📚 料理實驗紀錄庫</h3>
-    <ul id="list"></ul>
-  </div>
-
+  <!-- Firebase SDK -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { 
-      getFirestore, collection, addDoc, getDocs, query, where 
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      getFirestore, 
+      collection, 
+      addDoc, 
+      onSnapshot, 
+      doc, 
+      updateDoc, 
+      deleteDoc, 
+      serverTimestamp,
+      query,
+      orderBy 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+    // ✅ 已代入你的 Firebase 設定
     const firebaseConfig = {
       apiKey: "AIzaSyA0gCb7A7YPareF8esh8ct-rj955CjCPZM",
       authDomain: "my-test-db-b9117.firebaseapp.com",
@@ -98,104 +100,105 @@
       measurementId: "G-EGC3BZZD3P"
     };
 
+    // 初始化 Firebase & Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const todosRef = collection(db, "todos");
 
-    // 預設將今天的日期帶入日期輸入框
-    document.getElementById("cookDate").valueAsDate = new Date();
+    // DOM 元素
+    const todoForm = document.getElementById('todo-form');
+    const todoInput = document.getElementById('todo-input');
+    const todoList = document.getElementById('todo-list');
+    const completedCountEl = document.getElementById('completed-count');
+    const totalCountEl = document.getElementById('total-count');
 
-    // 1. 新增料理紀錄到 Firestore
-    window.addRecipe = async function() {
-      const name = document.getElementById("foodName").value;
-      const date = document.getElementById("cookDate").value;
-      const category = document.getElementById("foodCategory").value;
-      const steps = document.getElementById("foodSteps").value;
-      const tryAgain = document.getElementById("tryAgain").value;
+    // 顯示今日日期
+    const options = { weekday: 'long', month: 'short', day: 'numeric' };
+    document.getElementById('date-display').textContent = new Date().toLocaleDateString('zh-TW', options);
 
-      if (!name) {
-        alert("請輸入料理名稱！");
-        return;
+    // 新增代辦事項
+    todoForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = todoInput.value.trim();
+      if (!text) return;
+
+      try {
+        await addDoc(todosRef, {
+          text: text,
+          completed: false,
+          createdAt: serverTimestamp()
+        });
+        todoInput.value = '';
+      } catch (err) {
+        console.error("新增失敗：", err);
+      }
+    });
+
+    // 實時監聽 Firestore 資料變更 (Realtime Sync)
+    const q = query(todosRef, orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+      todoList.innerHTML = '';
+      let completedCount = 0;
+      const totalCount = snapshot.docs.length;
+
+      if (totalCount === 0) {
+        todoList.innerHTML = `
+          <div class="text-center py-10 text-slate-400">
+            <i class="fa-regular fa-clipboard text-3xl mb-2 stroke-1"></i>
+            <p class="text-sm">目前沒有任何任務，新增一個吧！</p>
+          </div>`;
       }
 
-      // 儲存到 "recipes" 集合
-      await addDoc(collection(db, "recipes"), { 
-        name: name,
-        date: date,
-        category: category,
-        steps: steps,
-        tryAgain: tryAgain,
-        createdAt: new Date() // 新增建立時間戳記
-      });
-      
-      // 清空表單欄位
-      document.getElementById("foodName").value = "";
-      document.getElementById("foodSteps").value = "";
-      
-      alert("儲存成功！");
-      loadData(); // 重新讀取清單
-    }
+      snapshot.docs.forEach((docSnapshot) => {
+        const todo = docSnapshot.data();
+        const id = docSnapshot.id;
 
-    // 2. 隨機挑選料理 (只抽 "下次還想嘗試" 等於 "是" 的)
-    window.pickRandom = async function() {
-      // 透過 query 與 where 篩選 tryAgain == "是" 的資料
-      const q = query(collection(db, "recipes"), where("tryAgain", "==", "是"));
-      const querySnapshot = await getDocs(q);
-      
-      const recipesArray = [];
-      querySnapshot.forEach(doc => {
-        recipesArray.push(doc.data());
-      });
+        if (todo.completed) completedCount++;
 
-      const resultDiv = document.getElementById("randomResult");
-      resultDiv.style.display = "block";
-      
-      if (recipesArray.length === 0) {
-        resultDiv.innerHTML = "目前沒有標記為「還想嘗試」的料理喔，快去新增吧！";
-      } else {
-        const randomIndex = Math.floor(Math.random() * recipesArray.length);
-        const selected = recipesArray[randomIndex];
-        resultDiv.innerHTML = `
-          <strong>🎉 今天就做：【 ${selected.name} 】！</strong><br>
-          <small>類別：${selected.category} | 上次實驗日期：${selected.date || '未填寫'}</small><br>
-          <div style="margin-top: 5px; white-space: pre-wrap;"><strong>做法備忘：</strong><br>${selected.steps || '無記載步驟'}</div>
-        `;
-      }
-    }
-
-    // 3. 載入所有歷史紀錄清單
-    async function loadData() {
-      const querySnapshot = await getDocs(collection(db, "recipes"));
-      const list = document.getElementById("list");
-      list.innerHTML = "";
-
-      if (querySnapshot.empty) {
-        list.innerHTML = "<li>目前還沒有任何實驗紀錄喔！</li>";
-        return;
-      }
-
-      querySnapshot.forEach(doc => {
-        const data = doc.data();
-        const tryAgainTagClass = data.tryAgain === "是" ? "tag-yes" : "tag-no";
+        const li = document.createElement('li');
+        li.className = `group flex items-center justify-between p-4 rounded-2xl bg-white/60 hover:bg-white border border-slate-100 shadow-sm transition-all duration-200 ${todo.completed ? 'opacity-60' : ''}`;
         
-        list.innerHTML += `
-          <li>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <strong>${data.name}</strong>
-              <small style="color: #666;">${data.date || ''}</small>
-            </div>
-            <div style="margin: 8px 0;">
-              <span class="tag">${data.category}</span>
-              <span class="tag ${tryAgainTagClass}">下次再試：${data.tryAgain}</span>
-            </div>
-            ${data.steps ? `<div style="font-size: 14px; color: #444; background: #f0f0f0; padding: 8px; border-radius: 4px; white-space: pre-wrap;">${data.steps}</div>` : ''}
-          </li>
+        li.innerHTML = `
+          <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
+            <button class="toggle-btn w-6 h-6 rounded-full border-2 ${todo.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-indigo-500'} flex items-center justify-center transition-colors shrink-0">
+              <i class="fa-solid fa-check text-xs ${todo.completed ? 'block' : 'hidden'}"></i>
+            </button>
+            <span class="text-sm text-slate-700 truncate ${todo.completed ? 'line-through text-slate-400' : 'font-medium'}">
+              ${escapeHtml(todo.text)}
+            </span>
+          </div>
+          <button class="delete-btn opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 p-2 transition-all">
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
         `;
+
+        // 切換完成狀態
+        li.querySelector('.toggle-btn').addEventListener('click', async () => {
+          await updateDoc(doc(db, "todos", id), {
+            completed: !todo.completed
+          });
+        });
+
+        // 刪除項目
+        li.querySelector('.delete-btn').addEventListener('click', async () => {
+          await deleteDoc(doc(db, "todos", id));
+        });
+
+        todoList.appendChild(li);
+      }, (error) => {
+        console.error("Firestore 監聽失敗：", error);
+        todoList.innerHTML = `<p class="text-center text-rose-500 text-sm">無法讀取資料，請確認 Firestore 權限規則設定。</p>`;
       });
+
+      // 更新統計數字
+      completedCountEl.textContent = completedCount;
+      totalCountEl.textContent = totalCount;
+    });
+
+    // 防範 XSS 攻擊轉義字元
+    function escapeHtml(text) {
+      return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : '';
     }
-
-    // 頁面載入完畢後先讀取一次
-    loadData();
   </script>
-
 </body>
 </html>
