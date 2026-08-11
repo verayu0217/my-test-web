@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>極簡工作台 | Learning & Task Dashboard</title>
+  <title>工作台</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 圖示套件 -->
@@ -17,7 +17,6 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
-    /* 隱藏滾動條但保持滾動功能 */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -29,80 +28,77 @@
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-slate-800 p-4 sm:p-8 flex items-center justify-center">
 
-  <!-- 主雙欄容器 -->
-  <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto">
+  <!-- 主橫向容器 (最大寬度提升至 7xl) -->
+  <div class="w-full max-w-7xl flex flex-col gap-6 my-auto">
 
-    <!-- ==================== 左欄：英文單字筆記庫 (佔 7 欄) ==================== -->
-    <main class="lg:col-span-7 glass-card rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 flex flex-col justify-between">
-      <div>
-        <!-- 標頭區塊 -->
-        <header class="mb-6 flex justify-between items-center">
-          <div>
-            <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
-              <i class="fa-solid fa-book-bookmark text-indigo-600 text-2xl"></i> Vocab Vault
-            </h1>
-            <p class="text-sm text-slate-500 mt-1">累積並複習你的個人英文單字庫</p>
-          </div>
+    <!-- ==================== 上方：大版面單字筆記庫 (全寬) ==================== -->
+    <main class="glass-card rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8">
+      <!-- 標頭區塊 -->
+      <header class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
+            <i class="fa-solid fa-book-bookmark text-indigo-600 text-2xl"></i> Vocab Vault
+          </h1>
+          <p class="text-sm text-slate-500 mt-1">累積與複習個人英文單字庫</p>
+        </div>
+        <div class="flex items-center gap-3">
           <div class="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">
             共 <span id="vocab-total-count">0</span> 個單字
           </div>
-        </header>
+        </div>
+      </header>
 
-        <!-- 新增單字表單 -->
-        <form id="vocab-form" class="space-y-2.5 mb-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
-          <div class="flex gap-2">
-            <input 
-              type="text" 
-              id="vocab-word" 
-              placeholder="英文單字 (例: Refactor)" 
-              class="flex-1 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              required
-            >
-            <select id="vocab-pos" class="px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="v.">v.</option>
-              <option value="n.">n.</option>
-              <option value="adj.">adj.</option>
-              <option value="adv.">adv.</option>
-              <option value="phr.">phr.</option>
-            </select>
-          </div>
+      <!-- 新增單字表單 (橫向一字排開) -->
+      <form id="vocab-form" class="grid grid-cols-1 sm:grid-cols-12 gap-3 mb-6 bg-slate-50/60 p-4 rounded-2xl border border-slate-100">
+        <div class="sm:col-span-3 flex gap-2">
           <input 
             type="text" 
-            id="vocab-meaning" 
-            placeholder="中文解釋 (例: 重構；修改程式碼)" 
-            class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            id="vocab-word" 
+            placeholder="單字 (例: Refactor)" 
+            class="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           >
-          <div class="flex gap-2">
-            <input 
-              type="text" 
-              id="vocab-example" 
-              placeholder="例句 (選填)" 
-              class="flex-1 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-6 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-indigo-500/20 active:scale-95">
-              儲存單字
-            </button>
-          </div>
-        </form>
-
-        <!-- A-Z 字母索引篩選條 -->
-        <div id="alpha-filter" class="flex gap-1 overflow-x-auto no-scrollbar mb-4 pb-1 text-xs">
-          <!-- 由 JS 動態生成 A-Z 按鈕 -->
+          <select id="vocab-pos" class="px-2.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="v.">v.</option>
+            <option value="n.">n.</option>
+            <option value="adj.">adj.</option>
+            <option value="adv.">adv.</option>
+            <option value="phr.">phr.</option>
+          </select>
         </div>
+        <input 
+          type="text" 
+          id="vocab-meaning" 
+          placeholder="中文解釋 (例: 重構)" 
+          class="sm:col-span-3 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          required
+        >
+        <input 
+          type="text" 
+          id="vocab-example" 
+          placeholder="例句 (選填)" 
+          class="sm:col-span-4 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        >
+        <button type="submit" class="sm:col-span-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-indigo-500/20 active:scale-95">
+          儲存單字
+        </button>
+      </form>
 
-        <!-- 單字列表展示區 -->
-        <ul id="vocab-list" class="space-y-3 min-h-[280px]">
-          <div class="text-center py-12 text-slate-400">
-            <i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i>
-            <p class="text-sm">連線至 Firebase 中...</p>
-          </div>
-        </ul>
+      <!-- A-Z 字母索引篩選條 -->
+      <div id="alpha-filter" class="flex gap-1.5 overflow-x-auto no-scrollbar mb-4 pb-1 text-xs">
+        <!-- 由 JS 動態生成 A-Z 按鈕 -->
       </div>
 
-      <!-- 底部分頁與頁尾 -->
-      <div class="mt-6 pt-4 border-t border-slate-200/60 flex flex-col sm:flex-row justify-between items-center gap-3">
-        <!-- 分頁控制按鈕 -->
+      <!-- 單字列表展示區 (使用 Grid 2 欄橫向排列) -->
+      <ul id="vocab-list" class="grid grid-cols-1 md:grid-cols-2 gap-3 min-h-[200px]">
+        <div class="col-span-full text-center py-10 text-slate-400">
+          <i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i>
+          <p class="text-sm">連線至 Firebase 中...</p>
+        </div>
+      </ul>
+
+      <!-- 分頁控制按鈕 -->
+      <div class="mt-6 pt-4 border-t border-slate-200/60 flex justify-between items-center">
         <div id="pagination-controls" class="flex items-center gap-2">
           <button id="prev-page" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
             <i class="fa-solid fa-chevron-left mr-1"></i>上一頁
@@ -112,91 +108,93 @@
             下一頁<i class="fa-solid fa-chevron-right ml-1"></i>
           </button>
         </div>
-
-        <footer class="text-xs text-slate-400 font-light">
-          Hosted on <span class="text-slate-600 font-medium">Vercel</span> • Powered by <span class="text-slate-600 font-medium">Firebase</span>
-        </footer>
+        <p class="text-xs text-slate-400 font-light hidden sm:block">提示：點擊喇叭按鈕可聆聽發音</p>
       </div>
     </main>
 
 
-    <!-- ==================== 右欄：TASKS & RESEARCH (佔 5 欄) ==================== -->
-    <aside class="lg:col-span-5 flex flex-col gap-6">
+    <!-- ==================== 下方：並排區塊 (My Tasks & 研究新東西) ==================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- 區塊 1：TO-DO LIST (My Tasks) -->
-      <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6 flex-1 flex flex-col justify-between">
+      <!-- 左下：My Tasks (佔 6 欄) -->
+      <section class="lg:col-span-6 glass-card rounded-3xl shadow-xl border border-white/20 p-6 flex flex-col justify-between">
         <div>
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h2 class="text-xl font-bold text-slate-800">My Tasks</h2>
+              <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-indigo-600 text-lg"></i> My Tasks
+              </h2>
               <p class="text-xs text-slate-400 mt-0.5" id="date-display">載入日期中...</p>
             </div>
             <div class="bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full text-xs font-semibold">
-              <span id="completed-count">0</span> / <span id="total-count">0</span>
+              <span id="completed-count">0</span> / <span id="total-count">0</span> 完成
             </div>
           </div>
 
           <!-- 新增 Task 表單 -->
-          <form id="todo-form" class="space-y-2 mb-4">
+          <form id="todo-form" class="flex flex-col sm:flex-row gap-2 mb-4">
             <input 
               type="text" 
               id="todo-input"
               placeholder="想完成什麼任務？" 
-              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm"
+              class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm"
               required
             >
-            <div class="flex gap-2">
-              <input 
-                type="date" 
-                id="todo-date"
-                class="flex-1 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-                required
-              >
-              <button 
-                type="submit" 
-                class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-xl transition-all font-medium shadow-md shadow-indigo-500/10 active:scale-95"
-              >
-                新增任務
-              </button>
-            </div>
+            <input 
+              type="date" 
+              id="todo-date"
+              class="px-3 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              required
+            >
+            <button 
+              type="submit" 
+              class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-indigo-500/10 active:scale-95 whitespace-nowrap"
+            >
+              新增
+            </button>
           </form>
 
           <!-- 待辦清單列表 -->
-          <ul id="todo-list" class="space-y-2.5 max-h-[260px] overflow-y-auto pr-1">
+          <ul id="todo-list" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
             <div class="text-center py-6 text-slate-400 text-xs">載入中...</div>
           </ul>
         </div>
       </section>
 
+      <!-- 右下：想要研究的新東西 (佔 6 欄) -->
+      <section class="lg:col-span-6 glass-card rounded-3xl shadow-xl border border-white/20 p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-2 text-purple-600 font-bold text-sm tracking-wider uppercase mb-4">
+            <i class="fa-solid fa-flask text-base"></i>
+            <span>想要研究的新東西 (Research Backlog)</span>
+          </div>
 
-      <!-- 區塊 2：想要研究的新東西 (Research Backlog) -->
-      <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6">
-        <div class="flex items-center gap-2 text-purple-600 font-bold text-sm tracking-wider uppercase mb-3">
-          <i class="fa-solid fa-flask text-base"></i>
-          <span>想要研究的新東西</span>
+          <!-- 新增研究主題表單 -->
+          <form id="research-form" class="flex gap-2 mb-4">
+            <input 
+              type="text" 
+              id="research-input" 
+              placeholder="如: Playwright, Docker, AWS..." 
+              class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              required
+            >
+            <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-purple-500/10 whitespace-nowrap">
+              新增主題
+            </button>
+          </form>
+
+          <!-- 研究主題列表 -->
+          <ul id="research-list" class="flex flex-wrap gap-2 max-h-[180px] overflow-y-auto pr-1">
+            <div class="text-center w-full py-4 text-slate-400 text-xs">載入清單中...</div>
+          </ul>
         </div>
 
-        <!-- 新增研究主題表單 -->
-        <form id="research-form" class="flex gap-2 mb-3">
-          <input 
-            type="text" 
-            id="research-input" 
-            placeholder="如: Playwright, Docker..." 
-            class="flex-1 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
-            required
-          >
-          <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3.5 py-2 rounded-xl transition-all font-medium shadow-md shadow-purple-500/10">
-            新增
-          </button>
-        </form>
-
-        <!-- 研究主題列表 -->
-        <ul id="research-list" class="flex flex-wrap gap-2 max-h-[110px] overflow-y-auto pr-1">
-          <div class="text-center w-full py-2 text-slate-400 text-xs">載入清單中...</div>
-        </ul>
+        <footer class="mt-4 pt-3 border-t border-slate-200/60 text-xs text-slate-400 font-light text-right">
+          Hosted on <span class="text-slate-600 font-medium">Vercel</span> • Powered by <span class="text-slate-600 font-medium">Firebase</span>
+        </footer>
       </section>
 
-    </aside>
+    </div>
 
   </div>
 
@@ -242,7 +240,7 @@
     document.getElementById('date-display').textContent = new Date().toLocaleDateString('zh-TW', options);
 
 
-    // ==================== 1. 英文單字筆記庫 (含 A-Z 篩選 + 分頁) ====================
+    // ==================== 1. 英文單字筆記庫 (大版面 2欄 + A-Z + 分頁) ====================
     const vocabForm = document.getElementById('vocab-form');
     const vocabList = document.getElementById('vocab-list');
     const vocabTotalCount = document.getElementById('vocab-total-count');
@@ -254,7 +252,7 @@
     let allVocabularies = [];
     let selectedLetter = 'ALL';
     let currentPage = 1;
-    const ITEMS_PER_PAGE = 5;
+    const ITEMS_PER_PAGE = 6; // 大版面改為一頁顯示 6 個單字 (2欄 x 3列)
 
     // 瀏覽器發音 (TTS)
     window.speakText = function(text) {
@@ -283,9 +281,8 @@
       alphaFilterContainer.querySelectorAll('.alpha-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           selectedLetter = e.target.dataset.letter;
-          currentPage = 1; // 切換分類時重置為第一頁
+          currentPage = 1;
           
-          // 更新按鈕樣式
           alphaFilterContainer.querySelectorAll('.alpha-btn').forEach(b => {
             b.className = "alpha-btn px-2.5 py-1 rounded-lg border font-medium transition-all bg-white text-slate-600 border-slate-200 hover:bg-slate-50";
           });
@@ -321,7 +318,6 @@
       }
     });
 
-    // 監聽單字庫數據變動
     onSnapshot(query(vocabRef, orderBy("createdAt", "desc")), (snapshot) => {
       allVocabularies = snapshot.docs.map(docSnapshot => ({
         id: docSnapshot.id,
@@ -331,9 +327,7 @@
       renderVocabularies();
     });
 
-    // 渲染單字列表與分頁控制
     function renderVocabularies() {
-      // 1. 根據字母過濾
       let filtered = allVocabularies;
       if (selectedLetter !== 'ALL') {
         filtered = allVocabularies.filter(item => 
@@ -341,44 +335,43 @@
         );
       }
 
-      // 2. 計算分頁
       const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
       if (currentPage > totalPages) currentPage = totalPages;
 
       const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
       const paginatedItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-      // 3. 更新分頁UI狀態
       pageInfoEl.textContent = `第 ${currentPage} / ${totalPages} 頁`;
       prevPageBtn.disabled = currentPage === 1;
       nextPageBtn.disabled = currentPage === totalPages;
 
-      // 4. 渲染卡片
       vocabList.innerHTML = '';
       if (paginatedItems.length === 0) {
-        vocabList.innerHTML = `<p class="text-center text-slate-400 text-sm py-10">此分類下尚無單字。</p>`;
+        vocabList.innerHTML = `<p class="col-span-full text-center text-slate-400 text-sm py-8">此分類下尚無單字。</p>`;
         return;
       }
 
       paginatedItems.forEach((item) => {
         const li = document.createElement('li');
-        li.className = "group bg-white/80 hover:bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-1.5 transition-all relative";
+        li.className = "group bg-white/80 hover:bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between gap-1.5 transition-all relative";
 
         li.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-baseline gap-2">
-              <span class="font-bold text-slate-800 text-base sm:text-lg tracking-wide">${escapeHtml(item.word)}</span>
-              <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md">${escapeHtml(item.pos)}</span>
-              <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-500 hover:text-indigo-700 text-sm ml-1 transition-transform active:scale-110" title="點擊發音">
-                <i class="fa-solid fa-volume-high"></i>
+          <div>
+            <div class="flex items-center justify-between">
+              <div class="flex items-baseline gap-2">
+                <span class="font-bold text-slate-800 text-base tracking-wide">${escapeHtml(item.word)}</span>
+                <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md">${escapeHtml(item.pos)}</span>
+                <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-500 hover:text-indigo-700 text-xs transition-transform active:scale-110" title="點擊發音">
+                  <i class="fa-solid fa-volume-high"></i>
+                </button>
+              </div>
+              <button class="delete-vocab opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all text-xs p-1">
+                <i class="fa-regular fa-trash-can"></i>
               </button>
             </div>
-            <button class="delete-vocab opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all text-xs p-1">
-              <i class="fa-regular fa-trash-can"></i>
-            </button>
+            <p class="text-xs sm:text-sm text-slate-700 font-medium mt-1">${escapeHtml(item.meaning)}</p>
           </div>
-          <p class="text-sm text-slate-700 font-medium">${escapeHtml(item.meaning)}</p>
-          ${item.example ? `<p class="text-xs text-slate-500 italic border-l-2 border-indigo-300 pl-2 mt-1 font-light">"${escapeHtml(item.example)}"</p>` : ''}
+          ${item.example ? `<p class="text-xs text-slate-500 italic border-l-2 border-indigo-300 pl-2 mt-1 font-light truncate">"${escapeHtml(item.example)}"</p>` : ''}
         `;
 
         li.querySelector('.delete-vocab').addEventListener('click', () => deleteDoc(doc(db, "vocabularies", item.id)));
@@ -386,7 +379,6 @@
       });
     }
 
-    // 分頁按鈕事件
     prevPageBtn.addEventListener('click', () => {
       if (currentPage > 1) {
         currentPage--;
@@ -547,8 +539,6 @@
       });
     });
 
-
-    // 防範 XSS 攻擊
     function escapeHtml(text) {
       return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : '';
     }
