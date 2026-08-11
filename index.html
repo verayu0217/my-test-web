@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>極簡工作台 | To-Do & Learning Dashboard</title>
+  <title>極簡工作台 | Learning & Task Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 圖示套件 -->
@@ -17,6 +17,14 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
+    /* 隱藏滾動條但保持滾動功能 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 min-h-screen text-slate-800 p-4 sm:p-8 flex items-center justify-center">
@@ -24,91 +32,33 @@
   <!-- 主雙欄容器 -->
   <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto">
 
-    <!-- ==================== 左欄：TO-DO LIST (佔 7 欄) ==================== -->
+    <!-- ==================== 左欄：英文單字筆記庫 (佔 7 欄) ==================== -->
     <main class="lg:col-span-7 glass-card rounded-3xl shadow-2xl border border-white/20 p-6 sm:p-8 flex flex-col justify-between">
       <div>
-        <!-- 標頭 -->
+        <!-- 標頭區塊 -->
         <header class="mb-6 flex justify-between items-center">
           <div>
-            <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              My Tasks
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent flex items-center gap-2">
+              <i class="fa-solid fa-book-bookmark text-indigo-600 text-2xl"></i> Vocab Vault
             </h1>
-            <p class="text-sm text-slate-500 mt-1" id="date-display">載入日期中...</p>
+            <p class="text-sm text-slate-500 mt-1">累積並複習你的個人英文單字庫</p>
           </div>
           <div class="bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-full text-xs font-semibold tracking-wide">
-            <span id="completed-count">0</span> / <span id="total-count">0</span> 完成
+            共 <span id="vocab-total-count">0</span> 個單字
           </div>
         </header>
 
-        <!-- 輸入框區塊 -->
-        <form id="todo-form" class="flex flex-col sm:flex-row gap-2 mb-6">
-          <div class="relative flex-1">
-            <input 
-              type="text" 
-              id="todo-input"
-              placeholder="想完成什麼任務？" 
-              class="w-full px-4 py-3 pl-11 rounded-xl bg-slate-100/80 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all text-sm"
-              required
-            >
-            <i class="fa-solid fa-plus absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-          </div>
-
-          <!-- 日期選擇器 -->
-          <input 
-            type="date" 
-            id="todo-date"
-            class="w-full sm:w-auto px-3 py-3 rounded-xl bg-slate-100/80 border border-slate-200 text-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all cursor-pointer"
-            required
-          >
-
-          <button 
-            type="submit" 
-            class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-3 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 text-sm flex items-center justify-center gap-2 whitespace-nowrap"
-          >
-            <span>新增</span>
-          </button>
-        </form>
-
-        <!-- 待辦清單列表 -->
-        <ul id="todo-list" class="space-y-3 max-h-[520px] overflow-y-auto pr-1">
-          <div class="text-center py-10 text-slate-400">
-            <i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i>
-            <p class="text-sm">連線至 Firebase 中...</p>
-          </div>
-        </ul>
-      </div>
-
-      <!-- 頁尾 -->
-      <footer class="mt-6 pt-4 border-t border-slate-200/60 text-xs text-slate-400 font-light text-center sm:text-left">
-        Hosted on <span class="text-slate-600 font-medium">Vercel</span> • Powered by <span class="text-slate-600 font-medium">Firebase</span>
-      </footer>
-    </main>
-
-
-    <!-- ==================== 右欄：學習與研究區 (佔 5 欄) ==================== -->
-    <aside class="lg:col-span-5 flex flex-col gap-6">
-
-      <!-- 區塊 1：英文單字筆記卡 (Word of the Day - 加高大版型) -->
-      <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6 flex-1">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2 text-indigo-600 font-bold text-sm tracking-wider uppercase">
-            <i class="fa-solid fa-language text-lg"></i>
-            <span>英文單字筆記</span>
-          </div>
-        </div>
-
         <!-- 新增單字表單 -->
-        <form id="vocab-form" class="space-y-2 mb-4">
+        <form id="vocab-form" class="space-y-2.5 mb-6 bg-slate-50/50 p-4 rounded-2xl border border-slate-100">
           <div class="flex gap-2">
             <input 
               type="text" 
               id="vocab-word" 
-              placeholder="英文單字 (例如: Refactor)" 
-              class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="英文單字 (例: Refactor)" 
+              class="flex-1 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               required
             >
-            <!-- 詞性下拉選單 -->
-            <select id="vocab-pos" class="px-2.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <select id="vocab-pos" class="px-3 py-2.5 rounded-xl bg-white border border-slate-200 text-sm font-semibold text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
               <option value="v.">v.</option>
               <option value="n.">n.</option>
               <option value="adj.">adj.</option>
@@ -119,8 +69,8 @@
           <input 
             type="text" 
             id="vocab-meaning" 
-            placeholder="中文解釋 (例如: 重構)" 
-            class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="中文解釋 (例: 重構；修改程式碼)" 
+            class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             required
           >
           <div class="flex gap-2">
@@ -128,45 +78,121 @@
               type="text" 
               id="vocab-example" 
               placeholder="例句 (選填)" 
-              class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              class="flex-1 px-4 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm px-5 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-indigo-500/10">
-              儲存
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-6 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-indigo-500/20 active:scale-95">
+              儲存單字
             </button>
           </div>
         </form>
 
-        <!-- 單字列表 (提升 max-height 讓區塊長度增加) -->
-        <ul id="vocab-list" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
-          <div class="text-center py-6 text-slate-400 text-xs">載入單字庫中...</div>
+        <!-- A-Z 字母索引篩選條 -->
+        <div id="alpha-filter" class="flex gap-1 overflow-x-auto no-scrollbar mb-4 pb-1 text-xs">
+          <!-- 由 JS 動態生成 A-Z 按鈕 -->
+        </div>
+
+        <!-- 單字列表展示區 -->
+        <ul id="vocab-list" class="space-y-3 min-h-[280px]">
+          <div class="text-center py-12 text-slate-400">
+            <i class="fa-solid fa-spinner animate-spin text-2xl mb-2"></i>
+            <p class="text-sm">連線至 Firebase 中...</p>
+          </div>
         </ul>
+      </div>
+
+      <!-- 底部分頁與頁尾 -->
+      <div class="mt-6 pt-4 border-t border-slate-200/60 flex flex-col sm:flex-row justify-between items-center gap-3">
+        <!-- 分頁控制按鈕 -->
+        <div id="pagination-controls" class="flex items-center gap-2">
+          <button id="prev-page" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+            <i class="fa-solid fa-chevron-left mr-1"></i>上一頁
+          </button>
+          <span id="page-info" class="text-xs text-slate-500 font-medium px-2">第 1 / 1 頁</span>
+          <button id="next-page" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+            下一頁<i class="fa-solid fa-chevron-right ml-1"></i>
+          </button>
+        </div>
+
+        <footer class="text-xs text-slate-400 font-light">
+          Hosted on <span class="text-slate-600 font-medium">Vercel</span> • Powered by <span class="text-slate-600 font-medium">Firebase</span>
+        </footer>
+      </div>
+    </main>
+
+
+    <!-- ==================== 右欄：TASKS & RESEARCH (佔 5 欄) ==================== -->
+    <aside class="lg:col-span-5 flex flex-col gap-6">
+
+      <!-- 區塊 1：TO-DO LIST (My Tasks) -->
+      <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6 flex-1 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-xl font-bold text-slate-800">My Tasks</h2>
+              <p class="text-xs text-slate-400 mt-0.5" id="date-display">載入日期中...</p>
+            </div>
+            <div class="bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full text-xs font-semibold">
+              <span id="completed-count">0</span> / <span id="total-count">0</span>
+            </div>
+          </div>
+
+          <!-- 新增 Task 表單 -->
+          <form id="todo-form" class="space-y-2 mb-4">
+            <input 
+              type="text" 
+              id="todo-input"
+              placeholder="想完成什麼任務？" 
+              class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-xs sm:text-sm"
+              required
+            >
+            <div class="flex gap-2">
+              <input 
+                type="date" 
+                id="todo-date"
+                class="flex-1 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                required
+              >
+              <button 
+                type="submit" 
+                class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-4 py-2 rounded-xl transition-all font-medium shadow-md shadow-indigo-500/10 active:scale-95"
+              >
+                新增任務
+              </button>
+            </div>
+          </form>
+
+          <!-- 待辦清單列表 -->
+          <ul id="todo-list" class="space-y-2.5 max-h-[260px] overflow-y-auto pr-1">
+            <div class="text-center py-6 text-slate-400 text-xs">載入中...</div>
+          </ul>
+        </div>
       </section>
 
 
       <!-- 區塊 2：想要研究的新東西 (Research Backlog) -->
       <section class="glass-card rounded-3xl shadow-xl border border-white/20 p-6">
-        <div class="flex items-center gap-2 text-purple-600 font-bold text-sm tracking-wider uppercase mb-4">
+        <div class="flex items-center gap-2 text-purple-600 font-bold text-sm tracking-wider uppercase mb-3">
           <i class="fa-solid fa-flask text-base"></i>
           <span>想要研究的新東西</span>
         </div>
 
         <!-- 新增研究主題表單 -->
-        <form id="research-form" class="flex gap-2 mb-4">
+        <form id="research-form" class="flex gap-2 mb-3">
           <input 
             type="text" 
             id="research-input" 
-            placeholder="如: Playwright, Docker, AWS..." 
-            class="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-100 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            placeholder="如: Playwright, Docker..." 
+            class="flex-1 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
             required
           >
-          <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm px-4 py-2.5 rounded-xl transition-all font-medium shadow-md shadow-purple-500/10">
+          <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white text-xs px-3.5 py-2 rounded-xl transition-all font-medium shadow-md shadow-purple-500/10">
             新增
           </button>
         </form>
 
-        <!-- 研究主題列表 (標籤式呈現) -->
-        <ul id="research-list" class="flex flex-wrap gap-2 max-h-[140px] overflow-y-auto pr-1">
-          <div class="text-center w-full py-4 text-slate-400 text-xs">載入清單中...</div>
+        <!-- 研究主題列表 -->
+        <ul id="research-list" class="flex flex-wrap gap-2 max-h-[110px] overflow-y-auto pr-1">
+          <div class="text-center w-full py-2 text-slate-400 text-xs">載入清單中...</div>
         </ul>
       </section>
 
@@ -212,11 +238,169 @@
     const researchRef = collection(db, "research");
 
     // 顯示今日日期
-    const options = { weekday: 'long', month: 'short', day: 'numeric' };
+    const options = { weekday: 'short', month: 'short', day: 'numeric' };
     document.getElementById('date-display').textContent = new Date().toLocaleDateString('zh-TW', options);
 
 
-    // ==================== 1. TO-DO LIST 邏輯 ====================
+    // ==================== 1. 英文單字筆記庫 (含 A-Z 篩選 + 分頁) ====================
+    const vocabForm = document.getElementById('vocab-form');
+    const vocabList = document.getElementById('vocab-list');
+    const vocabTotalCount = document.getElementById('vocab-total-count');
+    const alphaFilterContainer = document.getElementById('alpha-filter');
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const pageInfoEl = document.getElementById('page-info');
+
+    let allVocabularies = [];
+    let selectedLetter = 'ALL';
+    let currentPage = 1;
+    const ITEMS_PER_PAGE = 5;
+
+    // 瀏覽器發音 (TTS)
+    window.speakText = function(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        window.speechSynthesis.speak(utterance);
+      } else {
+        alert("您的瀏覽器不支援語音發音功能。");
+      }
+    };
+
+    // 初始化 A-Z 字母選擇按鈕
+    function initAlphaFilter() {
+      const letters = ['ALL', ...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')];
+      alphaFilterContainer.innerHTML = letters.map(letter => `
+        <button 
+          data-letter="${letter}" 
+          class="alpha-btn px-2.5 py-1 rounded-lg border font-medium transition-all ${letter === 'ALL' ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}"
+        >
+          ${letter}
+        </button>
+      `).join('');
+
+      alphaFilterContainer.querySelectorAll('.alpha-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          selectedLetter = e.target.dataset.letter;
+          currentPage = 1; // 切換分類時重置為第一頁
+          
+          // 更新按鈕樣式
+          alphaFilterContainer.querySelectorAll('.alpha-btn').forEach(b => {
+            b.className = "alpha-btn px-2.5 py-1 rounded-lg border font-medium transition-all bg-white text-slate-600 border-slate-200 hover:bg-slate-50";
+          });
+          e.target.className = "alpha-btn px-2.5 py-1 rounded-lg border font-medium transition-all bg-indigo-600 text-white border-indigo-600";
+          
+          renderVocabularies();
+        });
+      });
+    }
+
+    initAlphaFilter();
+
+    vocabForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const word = document.getElementById('vocab-word').value.trim();
+      const pos = document.getElementById('vocab-pos').value;
+      const meaning = document.getElementById('vocab-meaning').value.trim();
+      const example = document.getElementById('vocab-example').value.trim();
+
+      if (!word || !meaning) return;
+
+      try {
+        await addDoc(vocabRef, {
+          word,
+          pos,
+          meaning,
+          example,
+          createdAt: serverTimestamp()
+        });
+        vocabForm.reset();
+      } catch (err) {
+        console.error("新增單字失敗：", err);
+      }
+    });
+
+    // 監聽單字庫數據變動
+    onSnapshot(query(vocabRef, orderBy("createdAt", "desc")), (snapshot) => {
+      allVocabularies = snapshot.docs.map(docSnapshot => ({
+        id: docSnapshot.id,
+        ...docSnapshot.data()
+      }));
+      vocabTotalCount.textContent = allVocabularies.length;
+      renderVocabularies();
+    });
+
+    // 渲染單字列表與分頁控制
+    function renderVocabularies() {
+      // 1. 根據字母過濾
+      let filtered = allVocabularies;
+      if (selectedLetter !== 'ALL') {
+        filtered = allVocabularies.filter(item => 
+          item.word && item.word.trim().toUpperCase().startsWith(selectedLetter)
+        );
+      }
+
+      // 2. 計算分頁
+      const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const paginatedItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+      // 3. 更新分頁UI狀態
+      pageInfoEl.textContent = `第 ${currentPage} / ${totalPages} 頁`;
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages;
+
+      // 4. 渲染卡片
+      vocabList.innerHTML = '';
+      if (paginatedItems.length === 0) {
+        vocabList.innerHTML = `<p class="text-center text-slate-400 text-sm py-10">此分類下尚無單字。</p>`;
+        return;
+      }
+
+      paginatedItems.forEach((item) => {
+        const li = document.createElement('li');
+        li.className = "group bg-white/80 hover:bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-1.5 transition-all relative";
+
+        li.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-baseline gap-2">
+              <span class="font-bold text-slate-800 text-base sm:text-lg tracking-wide">${escapeHtml(item.word)}</span>
+              <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md">${escapeHtml(item.pos)}</span>
+              <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-500 hover:text-indigo-700 text-sm ml-1 transition-transform active:scale-110" title="點擊發音">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+            <button class="delete-vocab opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all text-xs p-1">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+          <p class="text-sm text-slate-700 font-medium">${escapeHtml(item.meaning)}</p>
+          ${item.example ? `<p class="text-xs text-slate-500 italic border-l-2 border-indigo-300 pl-2 mt-1 font-light">"${escapeHtml(item.example)}"</p>` : ''}
+        `;
+
+        li.querySelector('.delete-vocab').addEventListener('click', () => deleteDoc(doc(db, "vocabularies", item.id)));
+        vocabList.appendChild(li);
+      });
+    }
+
+    // 分頁按鈕事件
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        renderVocabularies();
+      }
+    });
+
+    nextPageBtn.addEventListener('click', () => {
+      currentPage++;
+      renderVocabularies();
+    });
+
+
+    // ==================== 2. TO-DO LIST 邏輯 ====================
     const todoForm = document.getElementById('todo-form');
     const todoInput = document.getElementById('todo-input');
     const todoDateInput = document.getElementById('todo-date');
@@ -264,12 +448,12 @@
         labelText = "明天";
         badgeClass = "bg-sky-50 text-sky-600 font-medium";
       } else if (diffDays < 0 && !isCompleted) {
-        labelText = `已逾期 (${dueDateStr})`;
+        labelText = `已逾期`;
         badgeClass = "bg-rose-50 text-rose-600 font-medium";
       }
 
-      return `<span class="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-md ${badgeClass}">
-        <i class="fa-regular fa-calendar text-[10px]"></i> ${labelText}
+      return `<span class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded ${badgeClass}">
+        <i class="fa-regular fa-calendar text-[9px]"></i> ${labelText}
       </span>`;
     }
 
@@ -279,7 +463,7 @@
       const totalCount = snapshot.docs.length;
 
       if (totalCount === 0) {
-        todoList.innerHTML = `<div class="text-center py-10 text-slate-400"><p class="text-sm">目前沒有任何任務！</p></div>`;
+        todoList.innerHTML = `<div class="text-center py-6 text-slate-400 text-xs"><p>沒有任何待辦事項！</p></div>`;
       }
 
       snapshot.docs.forEach((docSnapshot) => {
@@ -288,22 +472,22 @@
         if (todo.completed) completedCount++;
 
         const li = document.createElement('li');
-        li.className = `group flex items-center justify-between p-3.5 rounded-2xl bg-white/60 hover:bg-white border border-slate-100 shadow-sm transition-all ${todo.completed ? 'opacity-60' : ''}`;
+        li.className = `group flex items-center justify-between p-2.5 rounded-xl bg-white/60 hover:bg-white border border-slate-100 shadow-sm transition-all ${todo.completed ? 'opacity-60' : ''}`;
         
         li.innerHTML = `
-          <div class="flex items-center gap-3 flex-1 min-w-0 pr-2">
-            <button class="toggle-btn w-5 h-5 rounded-full border-2 ${todo.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-indigo-500'} flex items-center justify-center transition-colors shrink-0">
-              <i class="fa-solid fa-check text-[10px] ${todo.completed ? 'block' : 'hidden'}"></i>
+          <div class="flex items-center gap-2.5 flex-1 min-w-0 pr-2">
+            <button class="toggle-btn w-4 h-4 rounded-full border-2 ${todo.completed ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 hover:border-indigo-500'} flex items-center justify-center transition-colors shrink-0">
+              <i class="fa-solid fa-check text-[8px] ${todo.completed ? 'block' : 'hidden'}"></i>
             </button>
             <div class="flex flex-col min-w-0">
-              <span class="text-sm text-slate-700 truncate ${todo.completed ? 'line-through text-slate-400' : 'font-medium'}">
+              <span class="text-xs text-slate-700 truncate ${todo.completed ? 'line-through text-slate-400' : 'font-medium'}">
                 ${escapeHtml(todo.text)}
               </span>
               <div class="mt-0.5">${getDueDateBadge(todo.dueDate, todo.completed)}</div>
             </div>
           </div>
-          <button class="delete-btn opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 p-1.5 transition-all">
-            <i class="fa-regular fa-trash-can text-sm"></i>
+          <button class="delete-btn opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 p-1 transition-all">
+            <i class="fa-regular fa-trash-can text-xs"></i>
           </button>
         `;
 
@@ -314,82 +498,6 @@
 
       completedCountEl.textContent = completedCount;
       totalCountEl.textContent = totalCount;
-    });
-
-
-    // ==================== 2. 英文單字庫邏輯 (含詞性/發音 - 放大版) ====================
-    const vocabForm = document.getElementById('vocab-form');
-    const vocabList = document.getElementById('vocab-list');
-
-    // 瀏覽器發音 (TTS)
-    window.speakText = function(text) {
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
-      } else {
-        alert("您的瀏覽器不支援語音發音功能。");
-      }
-    };
-
-    vocabForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const word = document.getElementById('vocab-word').value.trim();
-      const pos = document.getElementById('vocab-pos').value;
-      const meaning = document.getElementById('vocab-meaning').value.trim();
-      const example = document.getElementById('vocab-example').value.trim();
-
-      if (!word || !meaning) return;
-
-      try {
-        await addDoc(vocabRef, {
-          word,
-          pos,
-          meaning,
-          example,
-          createdAt: serverTimestamp()
-        });
-        vocabForm.reset();
-      } catch (err) {
-        console.error("新增單字失敗：", err);
-      }
-    });
-
-    onSnapshot(query(vocabRef, orderBy("createdAt", "desc")), (snapshot) => {
-      vocabList.innerHTML = '';
-      if (snapshot.docs.length === 0) {
-        vocabList.innerHTML = `<p class="text-center text-slate-400 text-xs py-4">還沒有儲存單字，新增第一個吧！</p>`;
-      }
-
-      snapshot.docs.forEach((docSnapshot) => {
-        const item = docSnapshot.data();
-        const id = docSnapshot.id;
-
-        const li = document.createElement('li');
-        li.className = "group bg-white/80 hover:bg-white p-3.5 rounded-2xl border border-slate-100 shadow-sm flex flex-col gap-1 transition-all relative";
-
-        li.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-baseline gap-2">
-              <span class="font-bold text-slate-800 text-base tracking-wide">${escapeHtml(item.word)}</span>
-              <span class="text-xs font-semibold bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-md">${escapeHtml(item.pos)}</span>
-              <!-- 發音按鈕 -->
-              <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-500 hover:text-indigo-700 text-sm ml-1 transition-transform active:scale-110" title="點擊發音">
-                <i class="fa-solid fa-volume-high"></i>
-              </button>
-            </div>
-            <button class="delete-vocab opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all text-xs p-1">
-              <i class="fa-regular fa-trash-can"></i>
-            </button>
-          </div>
-          <p class="text-sm text-slate-700 font-medium">${escapeHtml(item.meaning)}</p>
-          ${item.example ? `<p class="text-xs text-slate-500 italic border-l-2 border-indigo-300 pl-2 mt-1 font-light">"${escapeHtml(item.example)}"</p>` : ''}
-        `;
-
-        li.querySelector('.delete-vocab').addEventListener('click', () => deleteDoc(doc(db, "vocabularies", id)));
-        vocabList.appendChild(li);
-      });
     });
 
 
@@ -417,7 +525,7 @@
     onSnapshot(query(researchRef, orderBy("createdAt", "desc")), (snapshot) => {
       researchList.innerHTML = '';
       if (snapshot.docs.length === 0) {
-        researchList.innerHTML = `<p class="text-center text-slate-400 text-xs w-full py-2">記下你想研究的新技術或主題吧！</p>`;
+        researchList.innerHTML = `<p class="text-center text-slate-400 text-xs w-full py-2">記下你想研究的新技術吧！</p>`;
       }
 
       snapshot.docs.forEach((docSnapshot) => {
@@ -425,7 +533,7 @@
         const id = docSnapshot.id;
 
         const li = document.createElement('li');
-        li.className = "group inline-flex items-center gap-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200/60 px-3 py-1.5 rounded-xl text-xs font-medium transition-all shadow-sm";
+        li.className = "group inline-flex items-center gap-1.5 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200/60 px-2.5 py-1 rounded-lg text-xs font-medium transition-all shadow-sm";
 
         li.innerHTML = `
           <span>${escapeHtml(item.topic)}</span>
