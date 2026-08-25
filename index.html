@@ -79,8 +79,8 @@
         <!-- JS 動態生成 A-Z 按鈕 -->
       </div>
 
-      <!-- 單字列表展示區 (2 欄，放大文字與清晰度) -->
-      <ul id="vocab-list" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 min-h-[180px]">
+      <!-- 單字列表展示區 (改為響應式 3 欄，並限制最大高度與加上垂直滾動) -->
+      <ul id="vocab-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 max-h-[560px] overflow-y-auto pr-1">
         <div class="col-span-full text-center py-8 text-indigo-400">
           <i class="fa-solid fa-spinner animate-spin text-xl mb-2"></i>
           <p class="text-xs font-medium">連線至 Firebase 中...</p>
@@ -240,7 +240,8 @@
     let allVocabularies = [];
     let selectedLetter = 'ALL';
     let currentPage = 1;
-    const ITEMS_PER_PAGE = 6;
+    // ✅ 修改單頁顯示數量為 20 個
+    const ITEMS_PER_PAGE = 20;
 
     // 發音
     window.speakText = function(text) {
@@ -341,16 +342,13 @@
 
       paginatedItems.forEach((item) => {
         const li = document.createElement('li');
-        // 卡片底色改為亮白的 Slate/Indigo 質感，邊框加強
         li.className = "group bg-slate-50/80 hover:bg-white p-4 rounded-xl border border-indigo-100/80 hover:border-indigo-300 shadow-2xs hover:shadow-sm flex flex-col justify-between transition-all relative";
 
         li.innerHTML = `
           <div>
             <div class="flex items-center justify-between">
               <div class="flex items-baseline gap-2">
-                <!-- 英文單字：顏色為活潑的 indigo-600，字體更大更清晰 -->
                 <span class="font-extrabold text-indigo-600 text-base sm:text-lg tracking-wide">${escapeHtml(item.word)}</span>
-                <!-- 詞性標籤：紫色活潑底 -->
                 <span class="text-xs font-bold text-purple-700 bg-purple-100/80 px-2 py-0.5 rounded-md">${escapeHtml(item.pos)}</span>
                 <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-400 hover:text-indigo-600 text-sm ml-1 transition-colors" title="發音">
                   <i class="fa-solid fa-volume-high"></i>
@@ -360,7 +358,6 @@
                 <i class="fa-regular fa-trash-can"></i>
               </button>
             </div>
-            <!-- 中文解釋：使用 slate-800 深色高對比、字體加大 -->
             <p class="text-sm text-slate-800 font-bold mt-1.5">${escapeHtml(item.meaning)}</p>
           </div>
           ${item.example ? `<p class="text-xs text-slate-500 italic border-l-2 border-indigo-400/60 pl-2 mt-2 truncate font-normal">"${escapeHtml(item.example)}"</p>` : ''}
