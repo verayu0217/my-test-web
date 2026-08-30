@@ -346,20 +346,18 @@
 
         li.innerHTML = `
           <div>
-            <div class="flex items-center justify-between">
-              <div class="flex items-baseline gap-2">
-                <span class="font-extrabold text-indigo-600 text-base sm:text-lg tracking-wide">${escapeHtml(item.word)}</span>
-                <span class="text-xs font-bold text-purple-700 bg-purple-100/80 px-2 py-0.5 rounded-md">${escapeHtml(item.pos)}</span>
-                <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-400 hover:text-indigo-600 text-sm ml-1 transition-colors" title="發音">
-                  <i class="fa-solid fa-volume-high"></i>
-                </button>
-              </div>
-              <button class="delete-vocab opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 transition-all text-xs">
-                <i class="fa-regular fa-trash-can"></i>
+            <div class="flex items-baseline gap-2 flex-wrap pr-8">
+              <span class="font-extrabold text-indigo-600 text-base sm:text-lg tracking-wide">${escapeHtml(item.word)}</span>
+              <span class="text-xs font-bold text-purple-700 bg-purple-100/80 px-2 py-0.5 rounded-md">${escapeHtml(item.pos)}</span>
+              <button onclick="speakText('${escapeHtml(item.word)}')" class="text-indigo-400 hover:text-indigo-600 text-sm ml-1 transition-colors" title="發音">
+                <i class="fa-solid fa-volume-high"></i>
               </button>
             </div>
             <p class="text-sm text-slate-800 font-bold mt-1.5">${escapeHtml(item.meaning)}</p>
           </div>
+          <button class="delete-vocab absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-md p-1.5 leading-none text-xs transition-all" title="刪除">
+            <i class="fa-regular fa-trash-can"></i>
+          </button>
           ${item.example ? `<p class="text-xs text-slate-500 italic border-l-2 border-indigo-400/60 pl-2 mt-2 truncate font-normal">"${escapeHtml(item.example)}"</p>` : ''}
         `;
 
