@@ -143,17 +143,8 @@
           <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
             <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
               <i class="fa-solid fa-list-check text-purple-500"></i> 核心單字與片語
-              <span class="text-xs font-normal text-slate-400">勾選要加入的項目</span>
+              <span class="text-xs font-normal text-slate-400">點 + 加入單字庫</span>
             </h3>
-            <div class="flex items-center gap-2">
-              <button id="select-all-vocab" class="text-xs text-purple-600 hover:text-purple-800 font-semibold px-1">全選 / 全不選</button>
-              <button
-                id="add-selected-vocab"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all active:scale-95 shadow-sm shadow-indigo-200 whitespace-nowrap"
-              >
-                加入單字庫
-              </button>
-            </div>
           </div>
           <ul id="analyze-vocab-list" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 max-h-[380px] overflow-y-auto pr-1"></ul>
         </div>
@@ -161,88 +152,81 @@
     </section>
 
 
-    <!-- ==================== 下方：並排區塊 (Tasks & Memo) ==================== -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- ==================== 下方：Tasks & Memo（分頁）==================== -->
+    <section class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col">
+      <div class="flex items-center gap-1 border-b border-slate-100 mb-4">
+        <button data-tab="tasks" class="tab-btn flex items-center gap-2 px-4 py-2.5 text-sm font-bold border-b-2 -mb-px transition-colors border-indigo-600 text-indigo-600">
+          <i class="fa-solid fa-check-square"></i> Tasks
+        </button>
+        <button data-tab="memo" class="tab-btn flex items-center gap-2 px-4 py-2.5 text-sm font-bold border-b-2 -mb-px transition-colors border-transparent text-slate-400 hover:text-slate-600">
+          <i class="fa-solid fa-note-sticky"></i> Memo
+        </button>
+      </div>
 
-      <!-- 左下：Tasks (佔 6 欄) -->
-      <section class="lg:col-span-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                <i class="fa-solid fa-check-square text-indigo-500"></i> Tasks
-              </h2>
-              <p class="text-xs text-slate-400 font-normal mt-0.5" id="date-display">載入日期中...</p>
-            </div>
-            <div class="bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-indigo-100">
-              <span id="completed-count">0</span> / <span id="total-count">0</span>
-            </div>
+      <!-- Tasks 分頁 -->
+      <div id="tab-panel-tasks" class="tab-panel">
+        <div class="flex items-center justify-between mb-4">
+          <p class="text-xs text-slate-400 font-normal" id="date-display">載入日期中...</p>
+          <div class="bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-indigo-100">
+            <span id="completed-count">0</span> / <span id="total-count">0</span>
           </div>
-
-          <!-- 新增 Task 表單 -->
-          <form id="todo-form" class="flex gap-2 mb-4">
-            <input 
-              type="text" 
-              id="todo-input"
-              placeholder="新增任務..." 
-              class="flex-1 px-3.5 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 placeholder:text-slate-400"
-              required
-            >
-            <input 
-              type="date" 
-              id="todo-date"
-              class="px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
-              required
-            >
-            <button 
-              type="submit" 
-              class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-2 rounded-lg transition-all font-semibold whitespace-nowrap active:scale-95 shadow-sm shadow-indigo-200"
-            >
-              新增
-            </button>
-          </form>
-
-          <!-- 清單 -->
-          <ul id="todo-list" class="space-y-2 max-h-[180px] overflow-y-auto pr-1">
-            <div class="text-center py-4 text-slate-400 text-xs">載入中...</div>
-          </ul>
-        </div>
-      </section>
-
-      <!-- 右下：Memo (佔 6 欄) -->
-      <section class="lg:col-span-6 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-2 text-slate-800 font-bold text-lg mb-4">
-            <i class="fa-solid fa-note-sticky text-amber-500"></i>
-            <span>Memo</span>
-          </div>
-
-          <!-- 新增 Memo 表單 -->
-          <form id="research-form" class="flex gap-2 mb-4">
-            <input 
-              type="text" 
-              id="research-input" 
-              placeholder="快速記下想法、技術或關鍵字..." 
-              class="flex-1 px-3.5 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 text-slate-800 placeholder:text-slate-400"
-              required
-            >
-            <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3.5 py-2 rounded-lg transition-all font-semibold whitespace-nowrap active:scale-95 shadow-sm shadow-amber-200">
-              記錄
-            </button>
-          </form>
-
-          <!-- 備忘標籤列表 -->
-          <ul id="research-list" class="flex flex-wrap gap-2 max-h-[140px] overflow-y-auto pr-1">
-            <div class="text-center w-full py-4 text-slate-400 text-xs">尚無紀錄...</div>
-          </ul>
         </div>
 
-        <footer class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-400 text-right font-light">
-          Hosted on Vercel • Powered by Firebase
-        </footer>
-      </section>
+        <!-- 新增 Task 表單 -->
+        <form id="todo-form" class="flex gap-2 mb-4">
+          <input
+            type="text"
+            id="todo-input"
+            placeholder="新增任務..."
+            class="flex-1 px-3.5 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 placeholder:text-slate-400"
+            required
+          >
+          <input
+            type="date"
+            id="todo-date"
+            class="px-2.5 py-2 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer"
+            required
+          >
+          <button
+            type="submit"
+            class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-2 rounded-lg transition-all font-semibold whitespace-nowrap active:scale-95 shadow-sm shadow-indigo-200"
+          >
+            新增
+          </button>
+        </form>
 
-    </div>
+        <!-- 清單 -->
+        <ul id="todo-list" class="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+          <div class="text-center py-4 text-slate-400 text-xs">載入中...</div>
+        </ul>
+      </div>
+
+      <!-- Memo 分頁 -->
+      <div id="tab-panel-memo" class="tab-panel hidden">
+        <!-- 新增 Memo 表單 -->
+        <form id="research-form" class="flex gap-2 mb-4">
+          <input
+            type="text"
+            id="research-input"
+            placeholder="快速記下想法、技術或關鍵字..."
+            class="flex-1 px-3.5 py-2 rounded-lg bg-slate-50 border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 text-slate-800 placeholder:text-slate-400"
+            required
+          >
+          <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white text-xs px-3.5 py-2 rounded-lg transition-all font-semibold whitespace-nowrap active:scale-95 shadow-sm shadow-amber-200">
+            記錄
+          </button>
+        </form>
+
+        <!-- 備忘標籤列表 -->
+        <ul id="research-list" class="flex flex-wrap gap-2 max-h-[280px] overflow-y-auto pr-1">
+          <div class="text-center w-full py-4 text-slate-400 text-xs">尚無紀錄...</div>
+        </ul>
+      </div>
+
+      <footer class="mt-4 pt-3 border-t border-slate-100 text-[11px] text-slate-400 text-right font-light">
+        Hosted on Vercel • Powered by Firebase
+      </footer>
+    </section>
 
   </div>
 
@@ -285,6 +269,24 @@
     // 顯示今日日期
     const options = { weekday: 'short', month: 'short', day: 'numeric' };
     document.getElementById('date-display').textContent = new Date().toLocaleDateString('zh-TW', options);
+
+
+    // ==================== Tab 切換 (Tasks / Memo) ====================
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          const active = b === btn;
+          b.classList.toggle('border-indigo-600', active);
+          b.classList.toggle('text-indigo-600', active);
+          b.classList.toggle('border-transparent', !active);
+          b.classList.toggle('text-slate-400', !active);
+        });
+        document.querySelectorAll('.tab-panel').forEach(p => {
+          p.classList.toggle('hidden', p.id !== `tab-panel-${target}`);
+        });
+      });
+    });
 
 
     // ==================== 1. Vocab 邏輯 ====================
@@ -599,8 +601,6 @@
     const translationChevron = document.getElementById('translation-chevron');
     const toggleTranslationBtn = document.getElementById('toggle-translation');
     const analyzeVocabList = document.getElementById('analyze-vocab-list');
-    const selectAllVocabBtn = document.getElementById('select-all-vocab');
-    const addSelectedVocabBtn = document.getElementById('add-selected-vocab');
 
     let analyzedItems = [];
 
@@ -608,6 +608,22 @@
       const hidden = translationBody.classList.toggle('hidden');
       translationChevron.style.transform = hidden ? 'rotate(-90deg)' : '';
     });
+
+    articleInput.addEventListener('input', () => {
+      if (articleInput.value.trim() === '') {
+        resetAnalysis();
+      }
+    });
+
+    function resetAnalysis() {
+      analyzeResult.classList.add('hidden');
+      translationBody.textContent = '';
+      translationBody.classList.remove('hidden');
+      translationChevron.style.transform = '';
+      analyzeVocabList.innerHTML = '';
+      analyzedItems = [];
+      analyzeStatus.textContent = '';
+    }
 
     analyzeBtn.addEventListener('click', async () => {
       const text = articleInput.value.trim();
@@ -652,12 +668,11 @@
         analyzeVocabList.innerHTML = `<li class="text-xs text-slate-400 py-3">沒有擷取到單字。</li>`;
       }
 
-      analyzedItems.forEach((item, idx) => {
+      analyzedItems.forEach((item) => {
         const isDup = existing.has(item.word.trim().toLowerCase());
         const li = document.createElement('li');
         li.className = "flex items-start gap-2.5 bg-slate-50/80 border border-slate-200/60 rounded-xl p-3";
         li.innerHTML = `
-          <input type="checkbox" data-idx="${idx}" ${isDup ? '' : 'checked'} class="vocab-check mt-1 w-4 h-4 accent-indigo-600 shrink-0 cursor-pointer">
           <div class="min-w-0 flex-1">
             <div class="flex items-baseline gap-2 flex-wrap">
               <span class="font-extrabold text-indigo-600 text-sm">${escapeHtml(item.word)}</span>
@@ -670,54 +685,46 @@
             <p class="text-xs text-slate-700 font-semibold mt-1">${escapeHtml(item.meaning)}</p>
             ${item.example ? `<p class="text-[11px] text-slate-500 italic mt-0.5">"${escapeHtml(item.example)}"</p>` : ''}
           </div>
+          <button
+            type="button"
+            class="add-analyze-item shrink-0 w-7 h-7 rounded-lg border flex items-center justify-center transition-all ${isDup ? 'text-slate-300 border-slate-200 cursor-not-allowed' : 'text-indigo-500 border-indigo-200 hover:bg-indigo-600 hover:text-white hover:border-indigo-600'}"
+            title="${isDup ? '已在單字庫' : '加入單字庫'}"
+            ${isDup ? 'disabled' : ''}
+          >
+            <i class="fa-solid fa-plus text-xs"></i>
+          </button>
         `;
         li.querySelector('.speak-analyze').addEventListener('click', () => speakText(item.word));
+
+        const addBtn = li.querySelector('.add-analyze-item');
+        if (!isDup) {
+          addBtn.addEventListener('click', async () => {
+            addBtn.disabled = true;
+            try {
+              await addDoc(vocabRef, {
+                word: item.word,
+                pos: item.pos,
+                meaning: item.meaning,
+                example: item.example || '',
+                createdAt: serverTimestamp()
+              });
+              existing.add(item.word.trim().toLowerCase());
+              addBtn.innerHTML = '<i class="fa-solid fa-check text-xs"></i>';
+              addBtn.title = '已加入';
+              addBtn.className = "add-analyze-item shrink-0 w-7 h-7 rounded-lg border flex items-center justify-center text-emerald-500 border-emerald-200";
+            } catch (err) {
+              console.error('加入失敗：', err);
+              analyzeStatus.textContent = '加入失敗：' + err.message;
+              addBtn.disabled = false;
+            }
+          });
+        }
+
         analyzeVocabList.appendChild(li);
       });
 
       analyzeResult.classList.remove('hidden');
     }
-
-    selectAllVocabBtn.addEventListener('click', () => {
-      const checks = [...analyzeVocabList.querySelectorAll('.vocab-check')];
-      const shouldCheck = checks.some(c => !c.checked);
-      checks.forEach(c => { c.checked = shouldCheck; });
-    });
-
-    addSelectedVocabBtn.addEventListener('click', async () => {
-      const checks = [...analyzeVocabList.querySelectorAll('.vocab-check:checked')];
-      if (checks.length === 0) {
-        analyzeStatus.textContent = '請先勾選要加入的項目。';
-        return;
-      }
-      addSelectedVocabBtn.disabled = true;
-      analyzeStatus.textContent = '加入中...';
-      const existing = new Set(allVocabularies.map(v => (v.word || '').trim().toLowerCase()));
-      let added = 0, skipped = 0;
-      try {
-        for (const chk of checks) {
-          const item = analyzedItems[Number(chk.dataset.idx)];
-          if (!item) continue;
-          const key = item.word.trim().toLowerCase();
-          if (existing.has(key)) { skipped++; continue; }
-          await addDoc(vocabRef, {
-            word: item.word,
-            pos: item.pos,
-            meaning: item.meaning,
-            example: item.example || '',
-            createdAt: serverTimestamp()
-          });
-          existing.add(key);
-          added++;
-        }
-        analyzeStatus.textContent = `已加入 ${added} 個` + (skipped ? `，略過 ${skipped} 個重複` : '');
-      } catch (err) {
-        console.error('加入失敗：', err);
-        analyzeStatus.textContent = '加入失敗：' + err.message;
-      } finally {
-        addSelectedVocabBtn.disabled = false;
-      }
-    });
   </script>
 </body>
 </html>
