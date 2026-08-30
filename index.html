@@ -102,6 +102,65 @@
     </main>
 
 
+    <!-- ==================== 中間：文章分析 ==================== -->
+    <section class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-purple-100/80 p-6 sm:p-7 transition-all">
+      <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 mb-4">
+        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i> 文章分析
+        </h2>
+        <span class="text-xs text-slate-400 font-normal">貼上英文文章，取得翻譯與核心單字片語</span>
+      </div>
+
+      <textarea
+        id="article-input"
+        rows="5"
+        placeholder="在這裡貼上一篇英文文章（最多 10000 字）..."
+        class="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 text-slate-800 placeholder:text-slate-400 resize-y leading-relaxed"
+      ></textarea>
+
+      <div class="flex items-center gap-3 mt-3">
+        <button
+          id="analyze-btn"
+          class="bg-purple-600 hover:bg-purple-700 text-white text-sm px-5 py-2.5 rounded-lg font-semibold transition-all active:scale-95 shadow-sm shadow-purple-200 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+        >
+          <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>分析
+        </button>
+        <span id="analyze-status" class="text-xs text-slate-500"></span>
+      </div>
+
+      <div id="analyze-result" class="hidden mt-5 space-y-5">
+        <!-- 全文翻譯 -->
+        <div>
+          <button id="toggle-translation" class="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+            <i class="fa-solid fa-language text-purple-500"></i> 全文翻譯
+            <i id="translation-chevron" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+          </button>
+          <div id="translation-body" class="text-sm text-slate-600 leading-relaxed bg-slate-50/70 border border-slate-200/60 rounded-xl p-4 whitespace-pre-wrap"></div>
+        </div>
+
+        <!-- 核心單字與片語 -->
+        <div>
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+            <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-purple-500"></i> 核心單字與片語
+              <span class="text-xs font-normal text-slate-400">勾選要加入的項目</span>
+            </h3>
+            <div class="flex items-center gap-2">
+              <button id="select-all-vocab" class="text-xs text-purple-600 hover:text-purple-800 font-semibold px-1">全選 / 全不選</button>
+              <button
+                id="add-selected-vocab"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-1.5 rounded-lg font-semibold transition-all active:scale-95 shadow-sm shadow-indigo-200 whitespace-nowrap"
+              >
+                加入單字庫
+              </button>
+            </div>
+          </div>
+          <ul id="analyze-vocab-list" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 max-h-[380px] overflow-y-auto pr-1"></ul>
+        </div>
+      </div>
+    </section>
+
+
     <!-- ==================== 下方：並排區塊 (Tasks & Memo) ==================== -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
@@ -529,6 +588,136 @@
     function escapeHtml(text) {
       return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;") : '';
     }
+
+
+    // ==================== 4. 文章分析 邏輯 ====================
+    const articleInput = document.getElementById('article-input');
+    const analyzeBtn = document.getElementById('analyze-btn');
+    const analyzeStatus = document.getElementById('analyze-status');
+    const analyzeResult = document.getElementById('analyze-result');
+    const translationBody = document.getElementById('translation-body');
+    const translationChevron = document.getElementById('translation-chevron');
+    const toggleTranslationBtn = document.getElementById('toggle-translation');
+    const analyzeVocabList = document.getElementById('analyze-vocab-list');
+    const selectAllVocabBtn = document.getElementById('select-all-vocab');
+    const addSelectedVocabBtn = document.getElementById('add-selected-vocab');
+
+    let analyzedItems = [];
+
+    toggleTranslationBtn.addEventListener('click', () => {
+      const hidden = translationBody.classList.toggle('hidden');
+      translationChevron.style.transform = hidden ? 'rotate(-90deg)' : '';
+    });
+
+    analyzeBtn.addEventListener('click', async () => {
+      const text = articleInput.value.trim();
+      if (text.length < 20) {
+        analyzeStatus.textContent = '請貼上較完整的文章。';
+        return;
+      }
+      analyzeBtn.disabled = true;
+      analyzeStatus.textContent = '分析中，約需 10~20 秒...';
+      try {
+        const resp = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || `伺服器錯誤 (${resp.status})`);
+        renderAnalysis(data);
+        analyzeStatus.textContent = '';
+      } catch (err) {
+        console.error('分析失敗：', err);
+        analyzeStatus.textContent = '分析失敗：' + err.message;
+      } finally {
+        analyzeBtn.disabled = false;
+      }
+    });
+
+    function renderAnalysis(data) {
+      translationBody.textContent = data.translation || '（無翻譯結果）';
+      translationBody.classList.remove('hidden');
+      translationChevron.style.transform = '';
+
+      analyzedItems = [
+        ...(data.vocab || []),
+        ...(data.phrases || [])
+      ];
+
+      const existing = new Set(allVocabularies.map(v => (v.word || '').trim().toLowerCase()));
+      analyzeVocabList.innerHTML = '';
+
+      if (analyzedItems.length === 0) {
+        analyzeVocabList.innerHTML = `<li class="text-xs text-slate-400 py-3">沒有擷取到單字。</li>`;
+      }
+
+      analyzedItems.forEach((item, idx) => {
+        const isDup = existing.has(item.word.trim().toLowerCase());
+        const li = document.createElement('li');
+        li.className = "flex items-start gap-2.5 bg-slate-50/80 border border-slate-200/60 rounded-xl p-3";
+        li.innerHTML = `
+          <input type="checkbox" data-idx="${idx}" ${isDup ? '' : 'checked'} class="vocab-check mt-1 w-4 h-4 accent-indigo-600 shrink-0 cursor-pointer">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-baseline gap-2 flex-wrap">
+              <span class="font-extrabold text-indigo-600 text-sm">${escapeHtml(item.word)}</span>
+              <span class="text-[11px] font-bold text-purple-700 bg-purple-100/80 px-1.5 py-0.5 rounded">${escapeHtml(item.pos)}</span>
+              <button type="button" class="speak-analyze text-indigo-400 hover:text-indigo-600 text-xs" title="發音">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+              ${isDup ? '<span class="text-[10px] text-amber-600 font-semibold">已在單字庫</span>' : ''}
+            </div>
+            <p class="text-xs text-slate-700 font-semibold mt-1">${escapeHtml(item.meaning)}</p>
+            ${item.example ? `<p class="text-[11px] text-slate-500 italic mt-0.5">"${escapeHtml(item.example)}"</p>` : ''}
+          </div>
+        `;
+        li.querySelector('.speak-analyze').addEventListener('click', () => speakText(item.word));
+        analyzeVocabList.appendChild(li);
+      });
+
+      analyzeResult.classList.remove('hidden');
+    }
+
+    selectAllVocabBtn.addEventListener('click', () => {
+      const checks = [...analyzeVocabList.querySelectorAll('.vocab-check')];
+      const shouldCheck = checks.some(c => !c.checked);
+      checks.forEach(c => { c.checked = shouldCheck; });
+    });
+
+    addSelectedVocabBtn.addEventListener('click', async () => {
+      const checks = [...analyzeVocabList.querySelectorAll('.vocab-check:checked')];
+      if (checks.length === 0) {
+        analyzeStatus.textContent = '請先勾選要加入的項目。';
+        return;
+      }
+      addSelectedVocabBtn.disabled = true;
+      analyzeStatus.textContent = '加入中...';
+      const existing = new Set(allVocabularies.map(v => (v.word || '').trim().toLowerCase()));
+      let added = 0, skipped = 0;
+      try {
+        for (const chk of checks) {
+          const item = analyzedItems[Number(chk.dataset.idx)];
+          if (!item) continue;
+          const key = item.word.trim().toLowerCase();
+          if (existing.has(key)) { skipped++; continue; }
+          await addDoc(vocabRef, {
+            word: item.word,
+            pos: item.pos,
+            meaning: item.meaning,
+            example: item.example || '',
+            createdAt: serverTimestamp()
+          });
+          existing.add(key);
+          added++;
+        }
+        analyzeStatus.textContent = `已加入 ${added} 個` + (skipped ? `，略過 ${skipped} 個重複` : '');
+      } catch (err) {
+        console.error('加入失敗：', err);
+        analyzeStatus.textContent = '加入失敗：' + err.message;
+      } finally {
+        addSelectedVocabBtn.disabled = false;
+      }
+    });
   </script>
 </body>
 </html>
