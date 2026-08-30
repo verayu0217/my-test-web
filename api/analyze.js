@@ -2,7 +2,7 @@
 // 接收一篇英文文章，回傳繁體中文翻譯 + 核心單字 + 核心片語。
 // 需要在 Vercel 專案設定 Environment Variables 加入 GEMINI_API_KEY。
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.6-flash";
 const MAX_CHARS = 10000;
 
 const SYSTEM_PROMPT = `你是專業的英文閱讀教學助手，服務對象是中高級的台灣英文學習者。
