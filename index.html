@@ -21,13 +21,13 @@
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50/50 via-slate-50 to-purple-50/40 min-h-screen text-slate-700 p-5 sm:p-8 flex items-center justify-center">
+<body class="bg-gradient-to-br from-indigo-50/50 via-slate-50 to-purple-50/40 min-h-screen text-slate-700 p-5 sm:p-8 flex items-start justify-center">
 
   <!-- 主容器 -->
-  <div class="w-full max-w-5xl flex flex-col gap-6 my-auto">
+  <div class="w-full max-w-5xl flex flex-col gap-6">
 
     <!-- ==================== 頂部導覽 ==================== -->
-    <nav class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-1.5 flex gap-1">
+    <nav class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-1.5 flex gap-1 sticky top-3 z-30">
       <button data-maintab="vocab" class="main-tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl transition-colors bg-indigo-600 text-white">
         <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">單字 &amp; 分析</span><span class="sm:hidden">單字</span>
       </button>
@@ -113,7 +113,7 @@
       </div>
 
       <!-- A-Z 字母索引篩選條 -->
-      <div id="alpha-filter" class="flex gap-1.5 overflow-x-auto no-scrollbar mb-5 pb-1 text-xs">
+      <div id="alpha-filter" class="flex flex-wrap gap-1.5 mb-5 text-xs">
         <!-- JS 動態生成 A-Z 按鈕 -->
       </div>
 
