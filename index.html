@@ -305,6 +305,29 @@
     </div>
   </div>
 
+  <!-- ==================== 確認刪除 Modal ==================== -->
+  <div id="confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-sm p-6">
+      <div class="flex items-start gap-3 mb-5">
+        <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-500 flex items-center justify-center shrink-0">
+          <i class="fa-regular fa-trash-can text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <h3 class="text-base font-bold text-slate-800">確認刪除</h3>
+          <p id="confirm-message" class="text-sm text-slate-500 mt-0.5 break-words">確定要刪除嗎？</p>
+        </div>
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" id="confirm-cancel" class="px-4 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-sm font-semibold transition-all">
+          取消
+        </button>
+        <button type="button" id="confirm-ok" class="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-sm font-semibold transition-all active:scale-95 shadow-sm shadow-rose-200">
+          刪除
+        </button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -361,6 +384,32 @@
           p.classList.toggle('hidden', p.id !== `main-panel-${target}`);
         });
       });
+    });
+
+
+    // ==================== 共用：確認刪除視窗 ====================
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmMessage = document.getElementById('confirm-message');
+    let confirmResolver = null;
+
+    function askConfirm(message) {
+      confirmMessage.textContent = message || '確定要刪除嗎？此動作無法復原。';
+      confirmModal.classList.remove('hidden');
+      return new Promise((resolve) => { confirmResolver = resolve; });
+    }
+
+    function settleConfirm(result) {
+      confirmModal.classList.add('hidden');
+      if (confirmResolver) { confirmResolver(result); confirmResolver = null; }
+    }
+
+    document.getElementById('confirm-ok').addEventListener('click', () => settleConfirm(true));
+    document.getElementById('confirm-cancel').addEventListener('click', () => settleConfirm(false));
+    confirmModal.addEventListener('click', (e) => {
+      if (e.target === confirmModal) settleConfirm(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !confirmModal.classList.contains('hidden')) settleConfirm(false);
     });
 
 
@@ -577,7 +626,11 @@
         `;
 
         li.querySelector('.edit-vocab').addEventListener('click', () => openVocabEdit(item));
-        li.querySelector('.delete-vocab').addEventListener('click', () => deleteDoc(doc(db, "vocabularies", item.id)));
+        li.querySelector('.delete-vocab').addEventListener('click', async () => {
+          if (await askConfirm(`確定要刪除單字「${item.word}」嗎？`)) {
+            deleteDoc(doc(db, "vocabularies", item.id));
+          }
+        });
         vocabList.appendChild(li);
       });
     }
@@ -801,7 +854,11 @@
         `;
 
         li.querySelector('.toggle-btn').addEventListener('click', () => updateDoc(doc(db, "todos", id), { completed: !todo.completed }));
-        li.querySelector('.delete-btn').addEventListener('click', () => deleteDoc(doc(db, "todos", id)));
+        li.querySelector('.delete-btn').addEventListener('click', async () => {
+          if (await askConfirm(`確定要刪除任務「${todo.text}」嗎？`)) {
+            deleteDoc(doc(db, "todos", id));
+          }
+        });
         todoList.appendChild(li);
       });
 
@@ -851,7 +908,11 @@
           </button>
         `;
 
-        li.querySelector('.delete-research').addEventListener('click', () => deleteDoc(doc(db, "research", id)));
+        li.querySelector('.delete-research').addEventListener('click', async () => {
+          if (await askConfirm(`確定要刪除「${item.topic}」嗎？`)) {
+            deleteDoc(doc(db, "research", id));
+          }
+        });
         researchList.appendChild(li);
       });
     });
