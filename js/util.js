@@ -19,6 +19,12 @@ export function speakText(text) {
 
 // 本地日期字串 YYYY-MM-DD（不受時區影響，跨日自動更新）
 export function localToday() {
+  return daysFromToday(0);
+}
+
+// 從今天算起 n 天後的本地日期字串（n 可為負）
+export function daysFromToday(n) {
   const d = new Date();
+  d.setDate(d.getDate() + n);
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }

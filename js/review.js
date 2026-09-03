@@ -1,7 +1,14 @@
 // 複習模式（全螢幕抽卡）
 import { db, doc, updateDoc } from './firebase.js';
-import { speakText, localToday } from './util.js';
+import { speakText, localToday, daysFromToday } from './util.js';
 import { getAllVocabularies } from './vocab.js';
+
+// Leitner 盒子：box N 的下次間隔天數
+const LADDER = [1, 2, 4, 7, 14, 30, 60];
+
+function isDue(v) {
+  return !v.nextReview || v.nextReview <= localToday();
+}
 
 const reviewModal = document.getElementById('review-modal');
 const reviewStartScreen = document.getElementById('review-start');
@@ -27,15 +34,19 @@ let reviewAgainList = [];
 function buildDeck(scope) {
   let pool = getAllVocabularies().slice();
   if (scope === 'due') {
-    pool = pool.filter(v => v.lastReviewDate !== localToday());
+    pool = pool.filter(isDue);
   }
-  pool.sort((a, b) => {
-    const ra = a.reviewCount || 0, rb = b.reviewCount || 0;
-    if (ra !== rb) return ra - rb;
-    const da = a.lastReviewDate || '', dbb = b.lastReviewDate || '';
-    return da < dbb ? -1 : da > dbb ? 1 : 0;
-  });
-  if (scope === 'least') pool = pool.slice(0, 20);
+  if (scope === 'least') {
+    // 最少複習優先
+    pool.sort((a, b) => (a.reviewCount || 0) - (b.reviewCount || 0));
+    pool = pool.slice(0, 20);
+  } else {
+    // 到期日越早（越該複習）排越前面，沒排過的最前
+    pool.sort((a, b) => {
+      const da = a.nextReview || '', dbb = b.nextReview || '';
+      return da < dbb ? -1 : da > dbb ? 1 : 0;
+    });
+  }
   return pool;
 }
 
@@ -48,8 +59,7 @@ function showReviewScreen(which) {
 function openReview() {
   const all = getAllVocabularies();
   reviewEmptyMsg.classList.add('hidden');
-  document.getElementById('review-due-count').textContent =
-    all.filter(v => v.lastReviewDate !== localToday()).length;
+  document.getElementById('review-due-count').textContent = all.filter(isDue).length;
   document.getElementById('review-all-count').textContent = all.length;
   reviewProgressText.textContent = '';
   reviewProgressBar.style.width = '0%';
@@ -67,7 +77,7 @@ function startReview(scope) {
   reviewDeck = buildDeck(scope);
   if (reviewDeck.length === 0) {
     reviewEmptyMsg.textContent = scope === 'due'
-      ? '今天的單字都複習完了 🎉'
+      ? '今天沒有到期的單字 🎉'
       : '單字庫還沒有單字。';
     reviewEmptyMsg.classList.remove('hidden');
     return;
@@ -106,7 +116,12 @@ async function answerReview(known) {
   else { reviewStats.again++; reviewAgainList.push(item); }
 
   const current = getAllVocabularies().find(v => v.id === item.id) || item;
+  const box = current.box || 0;
+  const newBox = known ? Math.min(box + 1, LADDER.length - 1) : 0;
+  const gapDays = known ? LADDER[newBox] : 1;
   updateDoc(doc(db, "vocabularies", item.id), {
+    box: newBox,
+    nextReview: daysFromToday(gapDays),
     reviewCount: (current.reviewCount || 0) + 1,
     lastReviewDate: localToday()
   }).catch(err => console.error('複習記錄失敗：', err));
