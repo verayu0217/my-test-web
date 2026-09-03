@@ -44,46 +44,41 @@
 
     <!-- ==================== 上方：VOCAB 區塊 ==================== -->
     <main class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-indigo-100/80 p-6 sm:p-7 transition-all">
-      <!-- 標頭區塊：僅留 Vocab，右側放總計 -->
-      <header class="mb-5 flex justify-between items-center">
-        <h1 class="text-3xl font-extrabold text-indigo-600 tracking-tight flex items-center gap-2.5">
-          <i class="fa-solid fa-book-open text-indigo-500 text-2xl"></i> Vocab
-        </h1>
+      <!-- 標頭：僅顯示總計字數 -->
+      <div class="mb-5 flex justify-end">
         <div class="bg-indigo-50 text-indigo-700 px-3.5 py-1 rounded-full text-xs font-semibold border border-indigo-100">
           總計 <span id="vocab-total-count" class="font-bold text-indigo-900 text-sm">0</span> 字
         </div>
-      </header>
+      </div>
 
       <!-- 新增單字表單 -->
-      <form id="vocab-form" class="relative z-10 grid grid-cols-1 sm:grid-cols-12 gap-2.5 mb-5 bg-indigo-50/30 p-4 rounded-xl border border-indigo-100/60">
-        <div class="sm:col-span-4 flex gap-2">
-          <input 
-            type="text" 
-            id="vocab-word" 
-            placeholder="單字 (例: Refactor)" 
-            class="flex-1 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 transition-all placeholder:text-slate-400"
-            required
-          >
-          <select id="vocab-pos" class="relative z-20 px-2.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-bold text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer">
-            <option value="v.">v.</option>
-            <option value="n.">n.</option>
-            <option value="adj.">adj.</option>
-            <option value="adv.">adv.</option>
-            <option value="phr.">phr.</option>
-          </select>
-        </div>
-        <input 
-          type="text" 
-          id="vocab-meaning" 
-          placeholder="中文解釋" 
+      <form id="vocab-form" class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 mb-5 bg-indigo-50/30 p-4 rounded-xl border border-indigo-100/60">
+        <input
+          type="text"
+          id="vocab-word"
+          placeholder="單字 (例: Refactor)"
           class="sm:col-span-3 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 transition-all placeholder:text-slate-400"
           required
         >
-        <input 
-          type="text" 
-          id="vocab-example" 
-          placeholder="例句 (選填)" 
-          class="sm:col-span-3 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 transition-all placeholder:text-slate-400"
+        <select id="vocab-pos" class="sm:col-span-2 px-2.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-bold text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer">
+          <option value="v.">v.</option>
+          <option value="n.">n.</option>
+          <option value="adj.">adj.</option>
+          <option value="adv.">adv.</option>
+          <option value="phr.">phr.</option>
+        </select>
+        <input
+          type="text"
+          id="vocab-meaning"
+          placeholder="中文解釋"
+          class="sm:col-span-3 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 transition-all placeholder:text-slate-400"
+          required
+        >
+        <input
+          type="text"
+          id="vocab-example"
+          placeholder="例句 (選填)"
+          class="sm:col-span-2 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 transition-all placeholder:text-slate-400"
         >
         <button type="submit" class="sm:col-span-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm px-4 py-2.5 rounded-lg transition-all font-semibold active:scale-95 shadow-sm shadow-indigo-200">
           儲存
@@ -117,8 +112,8 @@
         <!-- JS 動態生成 -->
       </div>
 
-      <!-- 單字列表展示區 (3 欄，限制最大高度與滾動) -->
-      <ul id="vocab-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 max-h-[520px] overflow-y-auto pr-1">
+      <!-- 單字列表展示區 (3 欄，每頁 15 筆，不再內捲) -->
+      <ul id="vocab-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         <div class="col-span-full text-center py-8 text-indigo-400">
           <i class="fa-solid fa-spinner animate-spin text-xl mb-2"></i>
           <p class="text-xs font-medium">連線至 Firebase 中...</p>
@@ -189,10 +184,6 @@
     <!-- ==================== 分頁：Tasks ==================== -->
     <div id="main-panel-tasks" class="main-panel hidden">
       <section class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col">
-        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
-          <i class="fa-solid fa-check-square text-indigo-500"></i> Tasks
-        </h2>
-
         <div class="flex items-center justify-between mb-4">
           <p class="text-xs text-slate-400 font-normal" id="date-display">載入日期中...</p>
           <div class="bg-indigo-50 text-indigo-700 px-2.5 py-0.5 rounded-full text-xs font-semibold border border-indigo-100">
@@ -234,10 +225,6 @@
     <!-- ==================== 分頁：Memo ==================== -->
     <div id="main-panel-memo" class="main-panel hidden">
       <section class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col">
-        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
-          <i class="fa-solid fa-note-sticky text-amber-500"></i> Memo
-        </h2>
-
         <!-- 新增 Memo 表單 -->
         <form id="research-form" class="flex gap-2 mb-4">
           <input
