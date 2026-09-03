@@ -44,11 +44,17 @@
 
     <!-- ==================== 上方：VOCAB 區塊 ==================== -->
     <main class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-indigo-100/80 p-6 sm:p-7 transition-all">
-      <!-- 標頭：僅顯示總計字數 -->
-      <div class="mb-5 flex justify-end">
+      <!-- 標頭：複習按鈕 + 統計 -->
+      <div class="mb-5 flex flex-wrap justify-end items-center gap-2">
+        <div class="bg-emerald-50 text-emerald-700 px-3.5 py-1 rounded-full text-xs font-semibold border border-emerald-100">
+          今天複習 <span id="reviewed-today-count" class="font-bold text-emerald-900 text-sm">0</span> 字
+        </div>
         <div class="bg-indigo-50 text-indigo-700 px-3.5 py-1 rounded-full text-xs font-semibold border border-indigo-100">
           總計 <span id="vocab-total-count" class="font-bold text-indigo-900 text-sm">0</span> 字
         </div>
+        <button id="start-review-btn" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-4 py-1.5 rounded-full transition-all active:scale-95 shadow-sm shadow-purple-200 flex items-center gap-1.5">
+          <i class="fa-solid fa-layer-group"></i> 複習模式
+        </button>
       </div>
 
       <!-- 新增單字表單 -->
@@ -315,6 +321,86 @@
     </div>
   </div>
 
+  <!-- ==================== 複習模式 Modal ==================== -->
+  <div id="review-modal" class="hidden fixed inset-0 z-50 bg-white flex flex-col">
+    <!-- 頂部：進度條 + 關閉 -->
+    <div class="flex items-center gap-3 p-4 border-b border-slate-100 shrink-0">
+      <button id="review-close" class="text-slate-400 hover:text-slate-600 text-lg leading-none px-1" title="關閉 (Esc)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+        <div id="review-progress-bar" class="h-full bg-purple-500 transition-all duration-300" style="width:0%"></div>
+      </div>
+      <span id="review-progress-text" class="text-xs font-semibold text-slate-500 tabular-nums w-14 text-right"></span>
+    </div>
+
+    <!-- 開始畫面 -->
+    <div id="review-start" class="flex-1 overflow-y-auto flex flex-col items-center justify-center gap-5 p-6 text-center">
+      <i class="fa-solid fa-layer-group text-4xl text-purple-400"></i>
+      <div>
+        <h3 class="text-xl font-bold text-slate-800">複習模式</h3>
+        <p class="text-sm text-slate-500 mt-1">先看英文，想一下再翻開中文</p>
+      </div>
+      <div class="flex flex-col gap-2.5 w-full max-w-xs">
+        <button data-scope="due" class="review-scope-btn px-4 py-3 rounded-xl border border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-800 text-sm font-bold transition-all">
+          今天還沒複習的（<span id="review-due-count">0</span>）
+        </button>
+        <button data-scope="least" class="review-scope-btn px-4 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all">
+          最少複習的 20 個
+        </button>
+        <button data-scope="all" class="review-scope-btn px-4 py-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-sm font-semibold transition-all">
+          全部單字（<span id="review-all-count">0</span>）
+        </button>
+      </div>
+      <p id="review-empty-msg" class="hidden text-sm text-slate-400"></p>
+    </div>
+
+    <!-- 卡片畫面 -->
+    <div id="review-card-screen" class="hidden flex-1 overflow-y-auto flex flex-col items-center justify-center gap-6 p-6">
+      <div id="review-card" class="w-full max-w-md bg-slate-50 border border-slate-200 rounded-2xl p-8 text-center cursor-pointer select-none min-h-[200px] flex flex-col justify-center">
+        <div class="flex items-center justify-center gap-2 flex-wrap">
+          <span id="review-word" class="text-3xl font-extrabold text-indigo-600 break-words"></span>
+          <span id="review-pos" class="text-sm font-bold text-purple-700 bg-purple-100/80 px-2 py-0.5 rounded"></span>
+          <button id="review-speak" class="text-indigo-400 hover:text-indigo-600 text-lg" title="發音">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+        </div>
+        <div id="review-back" class="hidden mt-5 pt-5 border-t border-slate-200">
+          <p id="review-meaning" class="text-lg font-bold text-slate-800 break-words"></p>
+          <p id="review-example" class="text-sm text-slate-500 italic mt-2 break-words whitespace-pre-wrap"></p>
+        </div>
+      </div>
+      <p id="review-hint" class="text-xs text-slate-400">點卡片或按空白鍵看中文</p>
+      <div id="review-answer-btns" class="hidden flex gap-3 w-full max-w-md">
+        <button id="review-again" class="flex-1 py-3 rounded-xl bg-rose-100 text-rose-700 font-bold hover:bg-rose-200 transition-all active:scale-95">
+          不記得
+        </button>
+        <button id="review-known" class="flex-1 py-3 rounded-xl bg-emerald-100 text-emerald-700 font-bold hover:bg-emerald-200 transition-all active:scale-95">
+          記得
+        </button>
+      </div>
+    </div>
+
+    <!-- 完成畫面 -->
+    <div id="review-done" class="hidden flex-1 overflow-y-auto flex flex-col items-center justify-center gap-4 p-6 text-center">
+      <i class="fa-solid fa-circle-check text-5xl text-emerald-400"></i>
+      <h3 class="text-xl font-bold text-slate-800">複習完成！</h3>
+      <p class="text-sm text-slate-600">
+        這次複習了 <span id="review-done-total" class="font-bold">0</span> 字 ·
+        記得 <span id="review-done-known" class="font-bold text-emerald-600">0</span> ·
+        不記得 <span id="review-done-again" class="font-bold text-rose-500">0</span>
+      </p>
+      <div class="flex gap-2">
+        <button id="review-redo-again" class="hidden px-4 py-2 rounded-xl bg-rose-100 hover:bg-rose-200 text-rose-700 text-sm font-semibold transition-all">
+          再練不記得的
+        </button>
+        <button id="review-finish" class="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-all active:scale-95">
+          完成
+        </button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -546,6 +632,7 @@
         ...docSnapshot.data()
       }));
       vocabTotalCount.textContent = allVocabularies.length;
+      updateReviewedTodayCount();
       renderVocabularies();
     });
 
@@ -746,6 +833,172 @@
         vocabEditStatus.textContent = '更新失敗，請稍後再試。';
         vocabEditStatus.classList.remove('hidden');
       }
+    });
+
+
+    // ==================== 1c. 複習模式 ====================
+    function localToday() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    const reviewedTodayCountEl = document.getElementById('reviewed-today-count');
+    function updateReviewedTodayCount() {
+      const t = localToday();
+      reviewedTodayCountEl.textContent = allVocabularies.filter(v => v.lastReviewDate === t).length;
+    }
+
+    const reviewModal = document.getElementById('review-modal');
+    const reviewStartScreen = document.getElementById('review-start');
+    const reviewCardScreen = document.getElementById('review-card-screen');
+    const reviewDoneScreen = document.getElementById('review-done');
+    const reviewProgressBar = document.getElementById('review-progress-bar');
+    const reviewProgressText = document.getElementById('review-progress-text');
+    const reviewCard = document.getElementById('review-card');
+    const reviewWordEl = document.getElementById('review-word');
+    const reviewPosEl = document.getElementById('review-pos');
+    const reviewMeaningEl = document.getElementById('review-meaning');
+    const reviewExampleEl = document.getElementById('review-example');
+    const reviewBackEl = document.getElementById('review-back');
+    const reviewHintEl = document.getElementById('review-hint');
+    const reviewAnswerBtns = document.getElementById('review-answer-btns');
+    const reviewEmptyMsg = document.getElementById('review-empty-msg');
+
+    let reviewDeck = [];
+    let reviewIndex = 0;
+    let reviewStats = { known: 0, again: 0 };
+    let reviewAgainList = [];
+
+    function buildDeck(scope) {
+      let pool = allVocabularies.slice();
+      if (scope === 'due') {
+        pool = pool.filter(v => v.lastReviewDate !== localToday());
+      }
+      pool.sort((a, b) => {
+        const ra = a.reviewCount || 0, rb = b.reviewCount || 0;
+        if (ra !== rb) return ra - rb;
+        const da = a.lastReviewDate || '', dbb = b.lastReviewDate || '';
+        return da < dbb ? -1 : da > dbb ? 1 : 0;
+      });
+      if (scope === 'least') pool = pool.slice(0, 20);
+      return pool;
+    }
+
+    function showReviewScreen(which) {
+      reviewStartScreen.classList.toggle('hidden', which !== 'start');
+      reviewCardScreen.classList.toggle('hidden', which !== 'card');
+      reviewDoneScreen.classList.toggle('hidden', which !== 'done');
+    }
+
+    function openReview() {
+      reviewEmptyMsg.classList.add('hidden');
+      document.getElementById('review-due-count').textContent =
+        allVocabularies.filter(v => v.lastReviewDate !== localToday()).length;
+      document.getElementById('review-all-count').textContent = allVocabularies.length;
+      reviewProgressText.textContent = '';
+      reviewProgressBar.style.width = '0%';
+      showReviewScreen('start');
+      reviewModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeReview() {
+      reviewModal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function startReview(scope) {
+      reviewDeck = buildDeck(scope);
+      if (reviewDeck.length === 0) {
+        reviewEmptyMsg.textContent = scope === 'due'
+          ? '今天的單字都複習完了 🎉'
+          : '單字庫還沒有單字。';
+        reviewEmptyMsg.classList.remove('hidden');
+        return;
+      }
+      reviewIndex = 0;
+      reviewStats = { known: 0, again: 0 };
+      reviewAgainList = [];
+      showReviewScreen('card');
+      showReviewCard();
+    }
+
+    function showReviewCard() {
+      const item = reviewDeck[reviewIndex];
+      reviewWordEl.textContent = item.word || '';
+      reviewPosEl.textContent = item.pos || '';
+      reviewMeaningEl.textContent = item.meaning || '';
+      reviewExampleEl.textContent = item.example ? `"${item.example}"` : '';
+      reviewBackEl.classList.add('hidden');
+      reviewAnswerBtns.classList.add('hidden');
+      reviewHintEl.classList.remove('hidden');
+      reviewProgressText.textContent = `${reviewIndex + 1} / ${reviewDeck.length}`;
+      reviewProgressBar.style.width = `${(reviewIndex / reviewDeck.length) * 100}%`;
+    }
+
+    function flipReviewCard() {
+      if (!reviewBackEl.classList.contains('hidden')) return;
+      reviewBackEl.classList.remove('hidden');
+      reviewHintEl.classList.add('hidden');
+      reviewAnswerBtns.classList.remove('hidden');
+    }
+
+    async function answerReview(known) {
+      if (reviewBackEl.classList.contains('hidden')) return;
+      const item = reviewDeck[reviewIndex];
+      if (known) reviewStats.known++;
+      else { reviewStats.again++; reviewAgainList.push(item); }
+
+      const current = allVocabularies.find(v => v.id === item.id) || item;
+      updateDoc(doc(db, "vocabularies", item.id), {
+        reviewCount: (current.reviewCount || 0) + 1,
+        lastReviewDate: localToday()
+      }).catch(err => console.error('複習記錄失敗：', err));
+
+      reviewIndex++;
+      if (reviewIndex >= reviewDeck.length) showReviewDone();
+      else showReviewCard();
+    }
+
+    function showReviewDone() {
+      reviewProgressBar.style.width = '100%';
+      reviewProgressText.textContent = `${reviewDeck.length} / ${reviewDeck.length}`;
+      document.getElementById('review-done-total').textContent = reviewStats.known + reviewStats.again;
+      document.getElementById('review-done-known').textContent = reviewStats.known;
+      document.getElementById('review-done-again').textContent = reviewStats.again;
+      document.getElementById('review-redo-again').classList.toggle('hidden', reviewAgainList.length === 0);
+      showReviewScreen('done');
+    }
+
+    document.getElementById('start-review-btn').addEventListener('click', openReview);
+    document.getElementById('review-close').addEventListener('click', closeReview);
+    document.getElementById('review-finish').addEventListener('click', closeReview);
+    document.querySelectorAll('.review-scope-btn').forEach(btn => {
+      btn.addEventListener('click', () => startReview(btn.dataset.scope));
+    });
+    document.getElementById('review-redo-again').addEventListener('click', () => {
+      reviewDeck = reviewAgainList.slice();
+      reviewIndex = 0;
+      reviewStats = { known: 0, again: 0 };
+      reviewAgainList = [];
+      showReviewScreen('card');
+      showReviewCard();
+    });
+    reviewCard.addEventListener('click', flipReviewCard);
+    document.getElementById('review-speak').addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (reviewDeck[reviewIndex]) speakText(reviewDeck[reviewIndex].word);
+    });
+    document.getElementById('review-again').addEventListener('click', () => answerReview(false));
+    document.getElementById('review-known').addEventListener('click', () => answerReview(true));
+    document.addEventListener('keydown', (e) => {
+      if (reviewModal.classList.contains('hidden')) return;
+      if (e.key === 'Escape') { closeReview(); return; }
+      if (reviewCardScreen.classList.contains('hidden')) return;
+      const flipped = !reviewBackEl.classList.contains('hidden');
+      if (!flipped && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); flipReviewCard(); }
+      else if (flipped && (e.key === '1' || e.key === 'ArrowLeft')) answerReview(false);
+      else if (flipped && (e.key === '2' || e.key === 'ArrowRight')) answerReview(true);
     });
 
 
