@@ -30,5 +30,6 @@ export const db = getFirestore(app);
 export const todosRef = collection(db, "todos");
 export const vocabRef = collection(db, "vocabularies");
 export const researchRef = collection(db, "research");
+export const awsNotesRef = collection(db, "awsNotes");
 
 export { addDoc, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy };

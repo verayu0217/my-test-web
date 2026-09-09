@@ -3,6 +3,7 @@ import './vocab.js';
 import './review.js';
 import './tasks.js';
 import './memo.js';
+import './aws.js';
 import './article.js';
 
 // ==================== 主分頁切換 (單字&分析 / Tasks / Memo) ====================

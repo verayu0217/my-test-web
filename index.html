@@ -37,6 +37,9 @@
       <button data-maintab="memo" class="main-tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl transition-colors text-slate-500 hover:bg-slate-100">
         <i class="fa-solid fa-note-sticky"></i> Memo
       </button>
+      <button data-maintab="aws" class="main-tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl transition-colors text-slate-500 hover:bg-slate-100">
+        <i class="fa-brands fa-aws"></i> AWS
+      </button>
     </nav>
 
     <!-- ==================== 分頁：單字 & 分析 ==================== -->
@@ -251,6 +254,91 @@
         </ul>
       </section>
     </div><!-- /main-panel-memo -->
+
+
+    <!-- ==================== 分頁：AWS 筆記 ==================== -->
+    <div id="main-panel-aws" class="main-panel hidden">
+      <section class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col gap-4">
+
+        <!-- 新增筆記表單 -->
+        <form id="aws-form" class="flex flex-col gap-2.5 bg-orange-50/40 p-4 rounded-xl border border-orange-100/60">
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <input
+              type="text"
+              id="aws-service"
+              list="aws-service-list"
+              placeholder="服務 (例: EBS)"
+              autocomplete="off"
+              class="sm:w-52 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-semibold text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-slate-400 placeholder:font-normal"
+              required
+            >
+            <input
+              type="text"
+              id="aws-action"
+              placeholder="API / 操作 (選填, 例: modifyVolume)"
+              autocomplete="off"
+              class="sm:flex-1 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-orange-400 text-slate-700 placeholder:text-slate-400 placeholder:font-sans"
+            >
+          </div>
+          <datalist id="aws-service-list">
+            <option value="EC2"></option>
+            <option value="EBS"></option>
+            <option value="S3"></option>
+            <option value="IAM"></option>
+            <option value="VPC"></option>
+            <option value="Lambda"></option>
+            <option value="RDS"></option>
+            <option value="DynamoDB"></option>
+            <option value="CloudFront"></option>
+            <option value="Route 53"></option>
+            <option value="CloudWatch"></option>
+            <option value="CloudFormation"></option>
+            <option value="ECS"></option>
+            <option value="EKS"></option>
+            <option value="SNS"></option>
+            <option value="SQS"></option>
+            <option value="API Gateway"></option>
+            <option value="Secrets Manager"></option>
+            <option value="KMS"></option>
+            <option value="ELB"></option>
+            <option value="Auto Scaling"></option>
+            <option value="EFS"></option>
+            <option value="Kinesis"></option>
+            <option value="Step Functions"></option>
+            <option value="EventBridge"></option>
+            <option value="Cognito"></option>
+          </datalist>
+          <textarea
+            id="aws-note"
+            rows="2"
+            placeholder="筆記內容 (例: 執行中的 volume 可直接改類型，不用先卸載)"
+            class="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-slate-800 placeholder:text-slate-400 resize-y leading-relaxed"
+            required
+          ></textarea>
+          <button type="submit" class="self-end bg-orange-500 hover:bg-orange-600 text-white text-sm px-5 py-2 rounded-lg transition-all font-semibold active:scale-95 shadow-sm shadow-orange-200">
+            記錄
+          </button>
+        </form>
+
+        <!-- 視圖切換 -->
+        <div class="flex items-center justify-between gap-2">
+          <div id="aws-filter-info" class="text-xs text-slate-400"></div>
+          <div class="flex gap-1 bg-slate-100 rounded-lg p-1 text-xs shrink-0">
+            <button data-view="list" class="aws-view-btn px-3 py-1.5 rounded-md font-semibold transition-all bg-white text-orange-600 shadow-sm">
+              <i class="fa-solid fa-list mr-1"></i>清單
+            </button>
+            <button data-view="board" class="aws-view-btn px-3 py-1.5 rounded-md font-semibold transition-all text-slate-500 hover:text-slate-700">
+              <i class="fa-solid fa-table-columns mr-1"></i>整理
+            </button>
+          </div>
+        </div>
+
+        <!-- 筆記展示區 -->
+        <div id="aws-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          <p class="col-span-full text-center text-slate-400 text-xs py-8">載入中...</p>
+        </div>
+      </section>
+    </div><!-- /main-panel-aws -->
 
     <footer class="pt-1 text-[11px] text-slate-400 text-right font-light">
       Hosted on Vercel • Powered by Firebase
