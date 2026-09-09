@@ -262,56 +262,110 @@
 
         <!-- 新增筆記表單 -->
         <form id="aws-form" class="flex flex-col gap-2.5 bg-orange-50/40 p-4 rounded-xl border border-orange-100/60">
-          <div class="flex flex-col sm:flex-row gap-2.5">
-            <input
-              type="text"
-              id="aws-service"
-              list="aws-service-list"
-              placeholder="服務 (例: EBS)"
-              autocomplete="off"
-              class="sm:w-52 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-semibold text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-slate-400 placeholder:font-normal"
-              required
-            >
-            <input
-              type="text"
-              id="aws-action"
-              placeholder="API / 操作 (選填, 例: modifyVolume)"
-              autocomplete="off"
-              class="sm:flex-1 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-orange-400 text-slate-700 placeholder:text-slate-400 placeholder:font-sans"
-            >
-          </div>
+          <input
+            type="text"
+            id="aws-service"
+            list="aws-service-list"
+            placeholder="服務 (例: EBS)"
+            autocomplete="off"
+            class="sm:w-52 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-semibold text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-slate-400 placeholder:font-normal"
+            required
+          >
           <datalist id="aws-service-list">
             <option value="EC2"></option>
             <option value="EBS"></option>
-            <option value="S3"></option>
-            <option value="IAM"></option>
-            <option value="VPC"></option>
+            <option value="Auto Scaling"></option>
+            <option value="ELB"></option>
             <option value="Lambda"></option>
-            <option value="RDS"></option>
-            <option value="DynamoDB"></option>
-            <option value="CloudFront"></option>
-            <option value="Route 53"></option>
-            <option value="CloudWatch"></option>
-            <option value="CloudFormation"></option>
+            <option value="Fargate"></option>
             <option value="ECS"></option>
             <option value="EKS"></option>
+            <option value="ECR"></option>
+            <option value="App Runner"></option>
+            <option value="Batch"></option>
+            <option value="Elastic Beanstalk"></option>
+            <option value="Lightsail"></option>
+            <option value="S3"></option>
+            <option value="EFS"></option>
+            <option value="FSx"></option>
+            <option value="Storage Gateway"></option>
+            <option value="AWS Backup"></option>
+            <option value="RDS"></option>
+            <option value="Aurora"></option>
+            <option value="Aurora Serverless"></option>
+            <option value="DynamoDB"></option>
+            <option value="ElastiCache"></option>
+            <option value="Redshift"></option>
+            <option value="DocumentDB"></option>
+            <option value="Neptune"></option>
+            <option value="MemoryDB"></option>
+            <option value="VPC"></option>
+            <option value="Route 53"></option>
+            <option value="CloudFront"></option>
+            <option value="API Gateway"></option>
+            <option value="Direct Connect"></option>
+            <option value="Global Accelerator"></option>
+            <option value="PrivateLink"></option>
+            <option value="Transit Gateway"></option>
+            <option value="IAM"></option>
+            <option value="IAM Identity Center"></option>
+            <option value="Cognito"></option>
+            <option value="KMS"></option>
+            <option value="Secrets Manager"></option>
+            <option value="ACM"></option>
+            <option value="WAF"></option>
+            <option value="Shield"></option>
+            <option value="GuardDuty"></option>
+            <option value="Security Hub"></option>
+            <option value="Inspector"></option>
+            <option value="Macie"></option>
+            <option value="CloudWatch"></option>
+            <option value="CloudTrail"></option>
+            <option value="X-Ray"></option>
+            <option value="Config"></option>
+            <option value="CloudFormation"></option>
+            <option value="CDK"></option>
+            <option value="Systems Manager"></option>
+            <option value="Organizations"></option>
+            <option value="Control Tower"></option>
+            <option value="Service Catalog"></option>
             <option value="SNS"></option>
             <option value="SQS"></option>
-            <option value="API Gateway"></option>
-            <option value="Secrets Manager"></option>
-            <option value="KMS"></option>
-            <option value="ELB"></option>
-            <option value="Auto Scaling"></option>
-            <option value="EFS"></option>
-            <option value="Kinesis"></option>
-            <option value="Step Functions"></option>
             <option value="EventBridge"></option>
-            <option value="Cognito"></option>
+            <option value="Step Functions"></option>
+            <option value="Kinesis"></option>
+            <option value="MSK"></option>
+            <option value="AppSync"></option>
+            <option value="Glue"></option>
+            <option value="Athena"></option>
+            <option value="EMR"></option>
+            <option value="OpenSearch"></option>
+            <option value="QuickSight"></option>
+            <option value="Data Firehose"></option>
+            <option value="Lake Formation"></option>
+            <option value="SageMaker"></option>
+            <option value="Bedrock"></option>
+            <option value="Comprehend"></option>
+            <option value="Rekognition"></option>
+            <option value="Textract"></option>
+            <option value="CodePipeline"></option>
+            <option value="CodeBuild"></option>
+            <option value="CodeDeploy"></option>
+            <option value="CodeCommit"></option>
+            <option value="CodeArtifact"></option>
+            <option value="Amplify"></option>
+            <option value="SES"></option>
+            <option value="Pinpoint"></option>
+            <option value="DMS"></option>
+            <option value="Transfer Family"></option>
+            <option value="DataSync"></option>
+            <option value="Cost Explorer"></option>
+            <option value="Budgets"></option>
           </datalist>
           <textarea
             id="aws-note"
             rows="2"
-            placeholder="筆記內容 (例: 執行中的 volume 可直接改類型，不用先卸載)"
+            placeholder="速記內容..."
             class="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-slate-800 placeholder:text-slate-400 resize-y leading-relaxed"
             required
           ></textarea>

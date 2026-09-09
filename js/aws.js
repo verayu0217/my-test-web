@@ -4,7 +4,6 @@ import { escapeHtml } from './util.js';
 
 const form = document.getElementById('aws-form');
 const serviceInput = document.getElementById('aws-service');
-const actionInput = document.getElementById('aws-action');
 const noteInput = document.getElementById('aws-note');
 const listEl = document.getElementById('aws-list');
 const filterInfo = document.getElementById('aws-filter-info');
@@ -23,11 +22,9 @@ form.addEventListener('submit', async (e) => {
   try {
     await addDoc(awsNotesRef, {
       service,
-      action: actionInput.value.trim(),
       note,
       createdAt: serverTimestamp()
     });
-    actionInput.value = '';
     noteInput.value = '';
     serviceInput.focus();
   } catch (err) {
@@ -60,7 +57,6 @@ function cardHtml(n) {
     <div class="group relative bg-white border border-slate-200 rounded-xl p-3.5 hover:shadow-md hover:border-orange-200 transition-all">
       <div class="flex items-center gap-2 mb-1.5 flex-wrap">
         <button class="aws-badge text-[11px] font-bold text-orange-700 bg-orange-100/80 hover:bg-orange-200/80 px-2 py-0.5 rounded transition-colors" data-service="${escapeHtml(n.service)}">${escapeHtml(n.service)}</button>
-        ${n.action ? `<span class="text-[11px] font-mono text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">${escapeHtml(n.action)}</span>` : ''}
       </div>
       <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap break-words">${escapeHtml(n.note)}</p>
       <button class="aws-del absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all" data-id="${n.id}" title="刪除">
