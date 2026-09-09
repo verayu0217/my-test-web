@@ -37,11 +37,11 @@ viewBtns.forEach((btn) => {
     view = btn.dataset.view;
     viewBtns.forEach((b) => {
       const active = b === btn;
-      b.classList.toggle('bg-white', active);
-      b.classList.toggle('text-orange-600', active);
+      b.classList.toggle('bg-[#FF9900]', active);
+      b.classList.toggle('text-[#232F3E]', active);
       b.classList.toggle('shadow-sm', active);
-      b.classList.toggle('text-slate-500', !active);
-      b.classList.toggle('hover:text-slate-700', !active);
+      b.classList.toggle('text-slate-400', !active);
+      b.classList.toggle('hover:text-white', !active);
     });
     render();
   });
@@ -54,12 +54,12 @@ onSnapshot(query(awsNotesRef, orderBy('createdAt', 'desc')), (snapshot) => {
 
 function cardHtml(n) {
   return `
-    <div class="group relative bg-white border border-slate-200 rounded-xl p-3.5 hover:shadow-md hover:border-orange-200 transition-all">
+    <div class="group relative bg-[#2a3a4a] border border-white/10 rounded-xl p-3.5 hover:border-[#FF9900]/50 transition-all">
       <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-        <button class="aws-badge text-[11px] font-bold text-orange-700 bg-orange-100/80 hover:bg-orange-200/80 px-2 py-0.5 rounded transition-colors" data-service="${escapeHtml(n.service)}">${escapeHtml(n.service)}</button>
+        <button class="aws-badge text-[11px] font-bold text-[#FFB259] bg-[#FF9900]/20 hover:bg-[#FF9900]/30 px-2 py-0.5 rounded transition-colors" data-service="${escapeHtml(n.service)}">${escapeHtml(n.service)}</button>
       </div>
-      <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-wrap break-words">${escapeHtml(n.note)}</p>
-      <button class="aws-del absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all" data-id="${n.id}" title="刪除">
+      <p class="text-xs text-slate-200 leading-relaxed whitespace-pre-wrap break-words">${escapeHtml(n.note)}</p>
+      <button class="aws-del absolute top-2 right-2 opacity-0 group-hover:opacity-100 text-slate-500 hover:text-rose-400 transition-all" data-id="${n.id}" title="刪除">
         <i class="fa-solid fa-xmark text-xs"></i>
       </button>
     </div>`;
@@ -70,7 +70,7 @@ function render() {
   if (serviceFilter) items = items.filter((n) => n.service === serviceFilter);
 
   filterInfo.innerHTML = serviceFilter
-    ? `篩選：<span class="font-semibold text-orange-600">${escapeHtml(serviceFilter)}</span> <button id="aws-clear-filter" class="text-slate-400 hover:text-slate-600 ml-1">✕ 清除</button>`
+    ? `篩選：<span class="font-semibold text-[#FF9900]">${escapeHtml(serviceFilter)}</span> <button id="aws-clear-filter" class="text-slate-400 hover:text-white ml-1">✕ 清除</button>`
     : `${notes.length} 筆筆記`;
 
   if (items.length === 0) {
@@ -94,8 +94,8 @@ function render() {
         (s) => `
       <div class="shrink-0 w-72">
         <div class="flex items-center gap-2 mb-2 px-1">
-          <h3 class="text-sm font-bold text-slate-700">${escapeHtml(s)}</h3>
-          <span class="text-[11px] font-semibold text-slate-400 bg-slate-100 px-1.5 rounded-full">${groups[s].length}</span>
+          <h3 class="text-sm font-bold text-slate-100">${escapeHtml(s)}</h3>
+          <span class="text-[11px] font-semibold text-slate-400 bg-white/10 px-1.5 rounded-full">${groups[s].length}</span>
         </div>
         <div class="flex flex-col gap-2.5">
           ${groups[s].map(cardHtml).join('')}

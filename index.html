@@ -258,17 +258,17 @@
 
     <!-- ==================== 分頁：AWS 筆記 ==================== -->
     <div id="main-panel-aws" class="main-panel hidden">
-      <section class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-6 flex flex-col gap-4">
+      <section class="bg-[#232F3E] rounded-2xl shadow-sm border border-[#232F3E] p-6 flex flex-col gap-4">
 
         <!-- 新增筆記表單 -->
-        <form id="aws-form" class="flex flex-col gap-2.5 bg-orange-50/40 p-4 rounded-xl border border-orange-100/60">
+        <form id="aws-form" class="flex flex-col gap-2.5 bg-[#1b2530] p-4 rounded-xl border border-white/10">
           <input
             type="text"
             id="aws-service"
             list="aws-service-list"
             placeholder="服務 (例: EBS)"
             autocomplete="off"
-            class="sm:w-52 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-semibold text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder:text-slate-400 placeholder:font-normal"
+            class="sm:w-52 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-semibold text-[#c25e00] focus:outline-none focus:ring-2 focus:ring-[#FF9900] placeholder:text-slate-400 placeholder:font-normal"
             required
           >
           <datalist id="aws-service-list">
@@ -366,10 +366,10 @@
             id="aws-note"
             rows="2"
             placeholder="速記內容..."
-            class="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 text-slate-800 placeholder:text-slate-400 resize-y leading-relaxed"
+            class="w-full px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF9900] text-slate-800 placeholder:text-slate-400 resize-y leading-relaxed"
             required
           ></textarea>
-          <button type="submit" class="self-end bg-orange-500 hover:bg-orange-600 text-white text-sm px-5 py-2 rounded-lg transition-all font-semibold active:scale-95 shadow-sm shadow-orange-200">
+          <button type="submit" class="self-end bg-[#FF9900] hover:bg-[#ec7211] text-[#232F3E] text-sm px-5 py-2 rounded-lg transition-all font-bold active:scale-95 shadow-sm shadow-black/20">
             記錄
           </button>
         </form>
@@ -377,11 +377,11 @@
         <!-- 視圖切換 -->
         <div class="flex items-center justify-between gap-2">
           <div id="aws-filter-info" class="text-xs text-slate-400"></div>
-          <div class="flex gap-1 bg-slate-100 rounded-lg p-1 text-xs shrink-0">
-            <button data-view="list" class="aws-view-btn px-3 py-1.5 rounded-md font-semibold transition-all bg-white text-orange-600 shadow-sm">
+          <div class="flex gap-1 bg-black/20 rounded-lg p-1 text-xs shrink-0">
+            <button data-view="list" class="aws-view-btn px-3 py-1.5 rounded-md font-semibold transition-all bg-[#FF9900] text-[#232F3E] shadow-sm">
               <i class="fa-solid fa-list mr-1"></i>清單
             </button>
-            <button data-view="board" class="aws-view-btn px-3 py-1.5 rounded-md font-semibold transition-all text-slate-500 hover:text-slate-700">
+            <button data-view="board" class="aws-view-btn px-3 py-1.5 rounded-md font-semibold transition-all text-slate-400 hover:text-white">
               <i class="fa-solid fa-table-columns mr-1"></i>整理
             </button>
           </div>
