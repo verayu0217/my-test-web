@@ -29,7 +29,7 @@
     <!-- ==================== 頂部導覽 ==================== -->
     <nav class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-1.5 flex gap-1">
       <button data-maintab="vocab" class="main-tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl transition-colors bg-indigo-600 text-white">
-        <i class="fa-solid fa-book-open"></i> <span class="hidden sm:inline">單字 &amp; 分析</span><span class="sm:hidden">單字</span>
+        <i class="fa-solid fa-book-open"></i> 單字
       </button>
       <button data-maintab="tasks" class="main-tab-btn flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-bold rounded-xl transition-colors text-slate-500 hover:bg-slate-100">
         <i class="fa-solid fa-check-square"></i> Tasks
@@ -42,7 +42,7 @@
       </button>
     </nav>
 
-    <!-- ==================== 分頁：單字 & 分析 ==================== -->
+    <!-- ==================== 分頁：單字 ==================== -->
     <div id="main-panel-vocab" class="main-panel flex flex-col gap-6">
 
     <!-- ==================== 上方：VOCAB 區塊 ==================== -->
@@ -137,56 +137,6 @@
       </div>
     </main>
 
-
-    <!-- ==================== 中間：文章分析 ==================== -->
-    <section class="bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-purple-100/80 p-6 sm:p-7 transition-all">
-      <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1 mb-4">
-        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-wand-magic-sparkles text-purple-500"></i> 文章分析
-        </h2>
-        <span class="text-xs text-slate-400 font-normal">貼上英文文章，取得翻譯與核心單字片語</span>
-      </div>
-
-      <textarea
-        id="article-input"
-        rows="5"
-        placeholder="在這裡貼上一篇英文文章（最多 10000 字）..."
-        class="w-full px-3.5 py-3 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 text-slate-800 placeholder:text-slate-400 resize-y leading-relaxed"
-      ></textarea>
-
-      <div class="flex items-center gap-3 mt-3">
-        <button
-          id="analyze-btn"
-          class="bg-purple-600 hover:bg-purple-700 text-white text-sm px-5 py-2.5 rounded-lg font-semibold transition-all active:scale-95 shadow-sm shadow-purple-200 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-        >
-          <i class="fa-solid fa-wand-magic-sparkles mr-1.5"></i>分析
-        </button>
-        <span id="analyze-status" class="text-xs text-slate-500"></span>
-      </div>
-
-      <div id="analyze-result" class="hidden mt-5 space-y-5">
-        <!-- 全文翻譯 -->
-        <div>
-          <button id="toggle-translation" class="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
-            <i class="fa-solid fa-language text-purple-500"></i> 全文翻譯
-            <i id="translation-chevron" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
-          </button>
-          <div id="translation-body" class="text-sm text-slate-600 leading-relaxed bg-slate-50/70 border border-slate-200/60 rounded-xl p-4 whitespace-pre-wrap"></div>
-        </div>
-
-        <!-- 核心單字與片語 -->
-        <div>
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-            <h3 class="text-sm font-bold text-slate-700 flex items-center gap-2">
-              <i class="fa-solid fa-list-check text-purple-500"></i> 核心單字與片語
-              <span class="text-xs font-normal text-slate-400">點 + 加入單字庫</span>
-            </h3>
-          </div>
-          <ul id="analyze-vocab-list" class="grid grid-cols-1 md:grid-cols-2 gap-2.5 max-h-[380px] overflow-y-auto pr-1"></ul>
-        </div>
-      </div>
-    </section>
-
     </div><!-- /main-panel-vocab -->
 
 
@@ -262,15 +212,40 @@
 
         <!-- 新增筆記表單 -->
         <form id="aws-form" class="flex flex-col gap-2.5 bg-[#1b2530] p-4 rounded-xl border border-white/10">
-          <input
-            type="text"
-            id="aws-service"
-            list="aws-service-list"
-            placeholder="服務 (例: EBS)"
-            autocomplete="off"
-            class="sm:w-52 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-semibold text-[#c25e00] focus:outline-none focus:ring-2 focus:ring-[#FF9900] placeholder:text-slate-400 placeholder:font-normal"
-            required
-          >
+          <div class="flex flex-col sm:flex-row gap-2.5">
+            <input
+              type="text"
+              id="aws-service"
+              list="aws-service-list"
+              placeholder="服務 (例: EBS)"
+              autocomplete="off"
+              class="sm:w-52 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-semibold text-[#c25e00] focus:outline-none focus:ring-2 focus:ring-[#FF9900] placeholder:text-slate-400 placeholder:font-normal"
+              required
+            >
+            <input
+              type="text"
+              id="aws-category"
+              list="aws-category-list"
+              placeholder="分類 (選填, 例: 效能)"
+              autocomplete="off"
+              class="sm:w-44 px-3.5 py-2.5 rounded-lg bg-white border border-slate-200 text-sm font-medium text-sky-700 focus:outline-none focus:ring-2 focus:ring-[#FF9900] placeholder:text-slate-400 placeholder:font-normal"
+            >
+          </div>
+          <datalist id="aws-category-list">
+            <option value="效能"></option>
+            <option value="成本"></option>
+            <option value="安全"></option>
+            <option value="網路"></option>
+            <option value="可用性 / 容錯"></option>
+            <option value="備份 / 還原"></option>
+            <option value="擴縮"></option>
+            <option value="監控 / 日誌"></option>
+            <option value="權限 / IAM"></option>
+            <option value="設定 / 操作"></option>
+            <option value="限制 / 配額"></option>
+            <option value="概念 / 名詞"></option>
+            <option value="踩雷 / 注意"></option>
+          </datalist>
           <datalist id="aws-service-list">
             <option value="EC2"></option>
             <option value="EBS"></option>
@@ -374,18 +349,31 @@
           </button>
         </form>
 
-        <!-- 視圖切換 -->
-        <div class="flex items-center justify-between gap-2">
-          <div id="aws-filter-info" class="text-xs text-slate-400"></div>
-          <div class="flex gap-1 bg-black/20 rounded-lg p-1 text-xs shrink-0">
+        <!-- 搜尋 + 視圖切換 -->
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2.5">
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input
+              id="aws-search"
+              type="text"
+              placeholder="搜尋服務、分類或內容..."
+              class="w-full pl-8 pr-8 py-2 rounded-lg bg-[#1b2530] border border-white/10 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-[#FF9900]"
+            >
+            <button id="aws-search-clear" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs" title="清除">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <div class="flex gap-1 bg-black/20 rounded-lg p-1 text-xs shrink-0 self-start sm:self-auto">
             <button data-view="list" class="aws-view-btn px-3 py-1.5 rounded-md font-semibold transition-all bg-[#FF9900] text-[#232F3E] shadow-sm">
               <i class="fa-solid fa-list mr-1"></i>清單
             </button>
             <button data-view="board" class="aws-view-btn px-3 py-1.5 rounded-md font-semibold transition-all text-slate-400 hover:text-white">
-              <i class="fa-solid fa-table-columns mr-1"></i>整理
+              <i class="fa-solid fa-layer-group mr-1"></i>整理
             </button>
           </div>
         </div>
+
+        <div id="aws-filter-info" class="text-xs text-slate-400"></div>
 
         <!-- 筆記展示區 -->
         <div id="aws-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">

@@ -21,7 +21,7 @@ let searchTerm = '';
 let currentPage = 1;
 const ITEMS_PER_PAGE = 15;
 
-// 讓其他模組（複習模式、文章分析）取得目前的單字清單
+// 讓其他模組（複習模式）取得目前的單字清單
 export function getAllVocabularies() {
   return allVocabularies;
 }

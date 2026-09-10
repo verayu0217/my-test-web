@@ -4,9 +4,8 @@ import './review.js';
 import './tasks.js';
 import './memo.js';
 import './aws.js';
-import './article.js';
 
-// ==================== 主分頁切換 (單字&分析 / Tasks / Memo) ====================
+// ==================== 主分頁切換 (單字 / Tasks / Memo / AWS) ====================
 document.querySelectorAll('.main-tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const target = btn.dataset.maintab;
