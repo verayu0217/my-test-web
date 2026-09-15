@@ -1,5 +1,5 @@
 // AWS 筆記：快速記錄（服務 + 選填分類 + 內容）
-// 清單 / 依服務 / 依 AWS 類型整理，可搜尋、篩選、行內編輯
+// 清單 / 依服務 / 依 AWS 類型 / 非服務筆記整理，可搜尋、篩選、行內編輯
 import { db, awsNotesRef, addDoc, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from './firebase.js';
 import { escapeHtml } from './util.js';
 import { askConfirm } from './confirm.js';
@@ -14,12 +14,14 @@ const searchInput = document.getElementById('aws-search');
 const searchClear = document.getElementById('aws-search-clear');
 const viewBtns = document.querySelectorAll('.aws-view-btn');
 
-// 服務 -> AWS 官方分類（概略對照，找不到的歸「其他」）
+// 服務 -> AWS 官方分類（概略對照，找不到的視為非服務筆記，歸進「筆記」視圖）
+// 儲存 (Storage) 跟 資料庫 (Database) 是分開的兩類：EBS/S3/EFS 這種塊狀或檔案儲存算儲存，
+// RDS/Aurora/DynamoDB 這種資料庫服務算資料庫。
 const SERVICE_TYPE_MAP = {
   'EC2': '運算', 'Auto Scaling': '運算', 'App Runner': '運算', 'Batch': '運算',
   'Elastic Beanstalk': '運算', 'Lightsail': '運算',
   'Fargate': '容器', 'ECS': '容器', 'EKS': '容器', 'ECR': '容器',
-  'S3': '儲存', 'EFS': '儲存', 'FSx': '儲存', 'Storage Gateway': '儲存', 'AWS Backup': '儲存',
+  'EBS': '儲存', 'S3': '儲存', 'EFS': '儲存', 'FSx': '儲存', 'Storage Gateway': '儲存', 'AWS Backup': '儲存',
   'RDS': '資料庫', 'Aurora': '資料庫', 'Aurora Serverless': '資料庫', 'DynamoDB': '資料庫',
   'ElastiCache': '資料庫', 'DocumentDB': '資料庫', 'Neptune': '資料庫', 'MemoryDB': '資料庫',
   'VPC': '網路', 'Route 53': '網路', 'CloudFront': '網路', 'API Gateway': '網路',
@@ -41,8 +43,20 @@ const SERVICE_TYPE_MAP = {
   'SES': '客戶互動', 'Pinpoint': '客戶互動',
   'DMS': '遷移', 'Transfer Family': '遷移', 'DataSync': '遷移'
 };
+// 分類的中文 <-> 英文對照，「類型」視圖標題會兩個一起顯示
+const TYPE_LABEL_EN = {
+  '運算': 'Compute', '容器': 'Containers', '儲存': 'Storage', '資料庫': 'Database',
+  '網路': 'Networking', '安全': 'Security', '監控': 'Monitoring',
+  '帳戶管理': 'Account Management', '管理與治理': 'Management & Governance',
+  '應用整合': 'Application Integration', '分析': 'Analytics', '機器學習': 'Machine Learning',
+  '開發工具': 'Developer Tools', '客戶互動': 'Customer Engagement', '遷移': 'Migration'
+};
 function awsType(service) {
-  return SERVICE_TYPE_MAP[service] || '其他';
+  return SERVICE_TYPE_MAP[service] || null;
+}
+// 服務名稱有沒有對到已知的 AWS 服務——對不到的（像自己打的「部屬」）就不是服務，算「筆記」
+function isKnownService(service) {
+  return Object.prototype.hasOwnProperty.call(SERVICE_TYPE_MAP, service);
 }
 
 let notes = [];
@@ -154,11 +168,12 @@ function chip(label, onclearId) {
 const GRID_CLS = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 items-start';
 const SCROLL_CLS = 'max-h-[65vh] overflow-y-auto pr-1';
 
-function groupSection(title, count, items) {
+function groupSection(title, subtitle, count, items) {
   return `
     <div>
       <div class="flex items-center gap-2 mb-2.5 pb-1.5 border-b border-white/10">
         <h3 class="text-sm font-bold text-slate-100">${escapeHtml(title)}</h3>
+        ${subtitle ? `<span class="text-[11px] text-slate-500 font-medium">${escapeHtml(subtitle)}</span>` : ''}
         <span class="text-[11px] font-semibold text-slate-400 bg-white/10 px-1.5 rounded-full">${count}</span>
       </div>
       <div class="${GRID_CLS}">
@@ -179,32 +194,39 @@ function render() {
     );
   }
 
+  // 「類型」只看得出來是哪個 AWS 服務的筆記；「筆記」專門收沒對到已知服務的（例如自己打的「部屬」）
+  let viewItems = items;
+  if (view === 'type') viewItems = items.filter((n) => isKnownService(n.service));
+  else if (view === 'misc') viewItems = items.filter((n) => !isKnownService(n.service));
+
   const chips = [];
   if (serviceFilter) chips.push(chip(`服務：${serviceFilter}`, 'aws-clear-service'));
   if (categoryFilter) chips.push(chip(`分類：${categoryFilter}`, 'aws-clear-category'));
   filterInfo.innerHTML = chips.length
-    ? `<div class="flex flex-wrap items-center gap-1.5">${chips.join('')}<span class="text-slate-500">· ${items.length} 筆</span></div>`
-    : `${items.length} 筆筆記${searchTerm ? '（符合搜尋）' : ''}`;
+    ? `<div class="flex flex-wrap items-center gap-1.5">${chips.join('')}<span class="text-slate-500">· ${viewItems.length} 筆</span></div>`
+    : `${viewItems.length} 筆筆記${searchTerm ? '（符合搜尋）' : ''}`;
 
-  if (items.length === 0) {
+  if (viewItems.length === 0) {
     listEl.className = 'block';
     listEl.innerHTML = `<p class="text-center text-slate-400 text-xs py-8">${
       notes.length === 0 ? '還沒有 AWS 筆記，記一筆吧...' : '沒有符合的筆記'
     }</p>`;
   } else if (view === 'list') {
     listEl.className = `${GRID_CLS} ${SCROLL_CLS}`;
-    listEl.innerHTML = items.map(cardHtml).join('');
+    listEl.innerHTML = viewItems.map(cardHtml).join('');
   } else {
     const groupKey = view === 'type' ? (n) => awsType(n.service) : (n) => n.service;
     const groups = {};
-    items.forEach((n) => {
+    viewItems.forEach((n) => {
       const key = groupKey(n);
       if (!groups[key]) groups[key] = [];
       groups[key].push(n);
     });
     const keys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
     listEl.className = `flex flex-col gap-6 ${SCROLL_CLS}`;
-    listEl.innerHTML = keys.map((k) => groupSection(k, groups[k].length, groups[k])).join('');
+    listEl.innerHTML = keys
+      .map((k) => groupSection(k, view === 'type' ? TYPE_LABEL_EN[k] : '', groups[k].length, groups[k]))
+      .join('');
   }
 
   wireEvents();
