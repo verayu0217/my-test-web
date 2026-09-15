@@ -18,18 +18,18 @@ const viewBtns = document.querySelectorAll('.aws-view-btn');
 // 儲存 (Storage) 跟 資料庫 (Database) 是分開的兩類：EBS/S3/EFS 這種塊狀或檔案儲存算儲存，
 // RDS/Aurora/DynamoDB 這種資料庫服務算資料庫。
 const SERVICE_TYPE_MAP = {
-  'EC2': '運算', 'Auto Scaling': '運算', 'App Runner': '運算', 'Batch': '運算',
+  'EC2': '運算', 'Lambda': '運算', 'Auto Scaling': '運算', 'App Runner': '運算', 'Batch': '運算',
   'Elastic Beanstalk': '運算', 'Lightsail': '運算',
-  'Fargate': '容器', 'ECS': '容器', 'EKS': '容器', 'ECR': '容器',
+  'Fargate': '容器', 'ECS': '容器', 'EKS': '容器', 'ECR': '容器', 'Proton': '容器',
   'EBS': '儲存', 'S3': '儲存', 'EFS': '儲存', 'FSx': '儲存', 'Storage Gateway': '儲存', 'AWS Backup': '儲存',
   'RDS': '資料庫', 'Aurora': '資料庫', 'Aurora Serverless': '資料庫', 'DynamoDB': '資料庫',
   'ElastiCache': '資料庫', 'DocumentDB': '資料庫', 'Neptune': '資料庫', 'MemoryDB': '資料庫',
   'VPC': '網路', 'Route 53': '網路', 'CloudFront': '網路', 'API Gateway': '網路',
   'Direct Connect': '網路', 'Global Accelerator': '網路', 'PrivateLink': '網路',
-  'Transit Gateway': '網路', 'ELB': '網路',
-  'IAM': '安全', 'IAM Identity Center': '安全', 'Cognito': '安全', 'KMS': '安全',
-  'Secrets Manager': '安全', 'ACM': '安全', 'WAF': '安全', 'Shield': '安全',
-  'GuardDuty': '安全', 'Security Hub': '安全', 'Inspector': '安全', 'Macie': '安全',
+  'Transit Gateway': '網路', 'ELB': '網路', 'Site-to-Site VPN': '網路', 'Client VPN': '網路',
+  'IAM': '安全', 'IAM Identity Center': '安全', 'AD Connector': '安全', 'Directory Service': '安全',
+  'Cognito': '安全', 'KMS': '安全', 'Secrets Manager': '安全', 'ACM': '安全', 'Certificate Manager': '安全',
+  'WAF': '安全', 'Shield': '安全', 'GuardDuty': '安全', 'Security Hub': '安全', 'Inspector': '安全', 'Macie': '安全',
   'CloudWatch': '監控', 'CloudTrail': '監控', 'X-Ray': '監控',
   'Organizations': '帳戶管理', 'Control Tower': '帳戶管理', 'Cost Explorer': '帳戶管理', 'Budgets': '帳戶管理',
   'Config': '管理與治理', 'CloudFormation': '管理與治理', 'CDK': '管理與治理',
@@ -39,9 +39,9 @@ const SERVICE_TYPE_MAP = {
   'OpenSearch': '分析', 'QuickSight': '分析', 'Data Firehose': '分析', 'Lake Formation': '分析', 'Redshift': '分析',
   'SageMaker': '機器學習', 'Bedrock': '機器學習', 'Comprehend': '機器學習', 'Rekognition': '機器學習', 'Textract': '機器學習',
   'CodePipeline': '開發工具', 'CodeBuild': '開發工具', 'CodeDeploy': '開發工具',
-  'CodeCommit': '開發工具', 'CodeArtifact': '開發工具', 'Amplify': '開發工具',
+  'CodeCommit': '開發工具', 'CodeArtifact': '開發工具', 'CodeConnections': '開發工具', 'Amplify': '開發工具',
   'SES': '客戶互動', 'Pinpoint': '客戶互動',
-  'DMS': '遷移', 'Transfer Family': '遷移', 'DataSync': '遷移'
+  'DMS': '遷移', 'Transfer Family': '遷移', 'DataSync': '遷移', 'Elastic Disaster Recovery': '遷移'
 };
 // 分類的中文 <-> 英文對照，「類型」視圖標題會兩個一起顯示
 const TYPE_LABEL_EN = {
@@ -51,12 +51,20 @@ const TYPE_LABEL_EN = {
   '應用整合': 'Application Integration', '分析': 'Analytics', '機器學習': 'Machine Learning',
   '開發工具': 'Developer Tools', '客戶互動': 'Customer Engagement', '遷移': 'Migration'
 };
+// 正規化：去掉開頭的 AWS/Amazon、忽略大小寫——這樣「Amazon Pinpoint」「AWS Certificate Manager」
+// 也能對到「Pinpoint」「ACM/Certificate Manager」這些對照表裡的寫法
+function normalizeServiceName(service) {
+  return (service || '').trim().replace(/^(aws|amazon)\s+/i, '').toLowerCase();
+}
+const NORMALIZED_TYPE_MAP = Object.fromEntries(
+  Object.entries(SERVICE_TYPE_MAP).map(([k, v]) => [normalizeServiceName(k), v])
+);
 function awsType(service) {
-  return SERVICE_TYPE_MAP[service] || null;
+  return NORMALIZED_TYPE_MAP[normalizeServiceName(service)] || null;
 }
 // 服務名稱有沒有對到已知的 AWS 服務——對不到的（像自己打的「部屬」）就不是服務，算「筆記」
 function isKnownService(service) {
-  return Object.prototype.hasOwnProperty.call(SERVICE_TYPE_MAP, service);
+  return Object.prototype.hasOwnProperty.call(NORMALIZED_TYPE_MAP, normalizeServiceName(service));
 }
 
 let notes = [];
