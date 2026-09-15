@@ -1,7 +1,8 @@
 // AWS 筆記：快速記錄（服務 + 選填分類 + 內容）
-// 清單 / 依服務整理（直向堆疊），可搜尋、篩選、行內編輯
+// 清單 / 依服務 / 依 AWS 類型整理，可搜尋、篩選、行內編輯
 import { db, awsNotesRef, addDoc, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy } from './firebase.js';
 import { escapeHtml } from './util.js';
+import { askConfirm } from './confirm.js';
 
 const form = document.getElementById('aws-form');
 const serviceInput = document.getElementById('aws-service');
@@ -12,6 +13,37 @@ const filterInfo = document.getElementById('aws-filter-info');
 const searchInput = document.getElementById('aws-search');
 const searchClear = document.getElementById('aws-search-clear');
 const viewBtns = document.querySelectorAll('.aws-view-btn');
+
+// 服務 -> AWS 官方分類（概略對照，找不到的歸「其他」）
+const SERVICE_TYPE_MAP = {
+  'EC2': '運算', 'Auto Scaling': '運算', 'App Runner': '運算', 'Batch': '運算',
+  'Elastic Beanstalk': '運算', 'Lightsail': '運算',
+  'Fargate': '容器', 'ECS': '容器', 'EKS': '容器', 'ECR': '容器',
+  'S3': '儲存', 'EFS': '儲存', 'FSx': '儲存', 'Storage Gateway': '儲存', 'AWS Backup': '儲存',
+  'RDS': '資料庫', 'Aurora': '資料庫', 'Aurora Serverless': '資料庫', 'DynamoDB': '資料庫',
+  'ElastiCache': '資料庫', 'DocumentDB': '資料庫', 'Neptune': '資料庫', 'MemoryDB': '資料庫',
+  'VPC': '網路', 'Route 53': '網路', 'CloudFront': '網路', 'API Gateway': '網路',
+  'Direct Connect': '網路', 'Global Accelerator': '網路', 'PrivateLink': '網路',
+  'Transit Gateway': '網路', 'ELB': '網路',
+  'IAM': '安全', 'IAM Identity Center': '安全', 'Cognito': '安全', 'KMS': '安全',
+  'Secrets Manager': '安全', 'ACM': '安全', 'WAF': '安全', 'Shield': '安全',
+  'GuardDuty': '安全', 'Security Hub': '安全', 'Inspector': '安全', 'Macie': '安全',
+  'CloudWatch': '監控', 'CloudTrail': '監控', 'X-Ray': '監控',
+  'Organizations': '帳戶管理', 'Control Tower': '帳戶管理', 'Cost Explorer': '帳戶管理', 'Budgets': '帳戶管理',
+  'Config': '管理與治理', 'CloudFormation': '管理與治理', 'CDK': '管理與治理',
+  'Systems Manager': '管理與治理', 'Service Catalog': '管理與治理',
+  'SNS': '應用整合', 'SQS': '應用整合', 'EventBridge': '應用整合', 'Step Functions': '應用整合', 'AppSync': '應用整合',
+  'Kinesis': '分析', 'MSK': '分析', 'Glue': '分析', 'Athena': '分析', 'EMR': '分析',
+  'OpenSearch': '分析', 'QuickSight': '分析', 'Data Firehose': '分析', 'Lake Formation': '分析', 'Redshift': '分析',
+  'SageMaker': '機器學習', 'Bedrock': '機器學習', 'Comprehend': '機器學習', 'Rekognition': '機器學習', 'Textract': '機器學習',
+  'CodePipeline': '開發工具', 'CodeBuild': '開發工具', 'CodeDeploy': '開發工具',
+  'CodeCommit': '開發工具', 'CodeArtifact': '開發工具', 'Amplify': '開發工具',
+  'SES': '客戶互動', 'Pinpoint': '客戶互動',
+  'DMS': '遷移', 'Transfer Family': '遷移', 'DataSync': '遷移'
+};
+function awsType(service) {
+  return SERVICE_TYPE_MAP[service] || '其他';
+}
 
 let notes = [];
 let view = 'list';
@@ -100,13 +132,12 @@ function cardHtml(n) {
     </div>`;
 }
 
+// 編輯表單一律直向排列——卡片格寬受 grid 欄數限制，並排容易被擠壓破版
 function editHtml(n) {
   return `
     <form class="aws-edit-form bg-[#2a3a4a] border border-[#FF9900]/40 rounded-xl p-3.5 flex flex-col gap-2" data-id="${n.id}">
-      <div class="flex flex-col sm:flex-row gap-2">
-        <input class="e-service sm:w-40 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-[#c25e00] focus:outline-none focus:ring-2 focus:ring-[#FF9900]" list="aws-service-list" value="${escapeHtml(n.service || '')}" placeholder="服務" required>
-        <input class="e-category flex-1 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-sky-700 focus:outline-none focus:ring-2 focus:ring-[#FF9900]" list="aws-category-list" value="${escapeHtml(n.category || '')}" placeholder="分類 (選填)">
-      </div>
+      <input class="e-service w-full px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-[#c25e00] focus:outline-none focus:ring-2 focus:ring-[#FF9900]" list="aws-service-list" value="${escapeHtml(n.service || '')}" placeholder="服務" required>
+      <input class="e-category w-full px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-sky-700 focus:outline-none focus:ring-2 focus:ring-[#FF9900]" list="aws-category-list" value="${escapeHtml(n.category || '')}" placeholder="分類 (選填)">
       <textarea class="e-note w-full px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#FF9900] resize-y leading-relaxed" rows="3" required>${escapeHtml(n.note || '')}</textarea>
       <div class="flex justify-end gap-1.5">
         <button type="button" class="e-cancel px-3 py-1.5 rounded-lg border border-white/15 text-slate-300 hover:text-white hover:border-white/30 text-xs font-semibold transition-all">取消</button>
@@ -117,6 +148,23 @@ function editHtml(n) {
 
 function chip(label, onclearId) {
   return `<span class="inline-flex items-center gap-1 bg-white/10 text-slate-200 px-2 py-0.5 rounded-full">${escapeHtml(label)}<button id="${onclearId}" class="text-slate-400 hover:text-white">✕</button></span>`;
+}
+
+// items-start：避免同一 grid row 因編輯中的卡片變高，把其他卡片一起撐開變形
+const GRID_CLS = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 items-start';
+const SCROLL_CLS = 'max-h-[65vh] overflow-y-auto pr-1';
+
+function groupSection(title, count, items) {
+  return `
+    <div>
+      <div class="flex items-center gap-2 mb-2.5 pb-1.5 border-b border-white/10">
+        <h3 class="text-sm font-bold text-slate-100">${escapeHtml(title)}</h3>
+        <span class="text-[11px] font-semibold text-slate-400 bg-white/10 px-1.5 rounded-full">${count}</span>
+      </div>
+      <div class="${GRID_CLS}">
+        ${items.map(cardHtml).join('')}
+      </div>
+    </div>`;
 }
 
 function render() {
@@ -138,38 +186,25 @@ function render() {
     ? `<div class="flex flex-wrap items-center gap-1.5">${chips.join('')}<span class="text-slate-500">· ${items.length} 筆</span></div>`
     : `${items.length} 筆筆記${searchTerm ? '（符合搜尋）' : ''}`;
 
-  const gridCls = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3';
-
   if (items.length === 0) {
     listEl.className = 'block';
     listEl.innerHTML = `<p class="text-center text-slate-400 text-xs py-8">${
       notes.length === 0 ? '還沒有 AWS 筆記，記一筆吧...' : '沒有符合的筆記'
     }</p>`;
   } else if (view === 'list') {
-    listEl.className = gridCls;
+    listEl.className = `${GRID_CLS} ${SCROLL_CLS}`;
     listEl.innerHTML = items.map(cardHtml).join('');
   } else {
+    const groupKey = view === 'type' ? (n) => awsType(n.service) : (n) => n.service;
     const groups = {};
     items.forEach((n) => {
-      if (!groups[n.service]) groups[n.service] = [];
-      groups[n.service].push(n);
+      const key = groupKey(n);
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(n);
     });
-    const services = Object.keys(groups).sort((a, b) => a.localeCompare(b));
-    listEl.className = 'flex flex-col gap-6';
-    listEl.innerHTML = services
-      .map(
-        (s) => `
-      <div>
-        <div class="flex items-center gap-2 mb-2.5 pb-1.5 border-b border-white/10">
-          <h3 class="text-sm font-bold text-slate-100">${escapeHtml(s)}</h3>
-          <span class="text-[11px] font-semibold text-slate-400 bg-white/10 px-1.5 rounded-full">${groups[s].length}</span>
-        </div>
-        <div class="${gridCls}">
-          ${groups[s].map(cardHtml).join('')}
-        </div>
-      </div>`
-      )
-      .join('');
+    const keys = Object.keys(groups).sort((a, b) => a.localeCompare(b));
+    listEl.className = `flex flex-col gap-6 ${SCROLL_CLS}`;
+    listEl.innerHTML = keys.map((k) => groupSection(k, groups[k].length, groups[k])).join('');
   }
 
   wireEvents();
@@ -177,7 +212,13 @@ function render() {
 
 function wireEvents() {
   listEl.querySelectorAll('.aws-del').forEach((b) => {
-    b.addEventListener('click', () => deleteDoc(doc(db, 'awsNotes', b.dataset.id)));
+    b.addEventListener('click', async () => {
+      const n = notes.find((x) => x.id === b.dataset.id);
+      const label = n ? `${n.service}${n.note ? '：' + n.note.slice(0, 20) : ''}` : '這筆筆記';
+      if (await askConfirm(`確定要刪除「${label}」嗎？此動作無法復原。`)) {
+        deleteDoc(doc(db, 'awsNotes', b.dataset.id));
+      }
+    });
   });
   listEl.querySelectorAll('.aws-edit').forEach((b) => {
     b.addEventListener('click', () => { editingId = b.dataset.id; render(); });
